@@ -1,4 +1,6 @@
 import scrapy
+from scrapy.loader import ItemLoader
+from scrapy.loader.processors import TakeFirst
 
 
 # Same as in ratings_parser.models, might change later
@@ -17,3 +19,8 @@ class Review(scrapy.Item):
     rating = scrapy.Field()
     title = scrapy.Field()
     username = scrapy.Field()
+
+
+class ReviewLoader(ItemLoader):
+    default_item_class = Review
+    default_output_processor = TakeFirst()
