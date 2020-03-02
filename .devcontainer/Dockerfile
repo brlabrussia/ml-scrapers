@@ -29,7 +29,7 @@ RUN apt-get update \
     && apt-get -y install git openssh-client iproute2 procps lsb-release \
     #
     # Install pylint
-    && pip --disable-pip-version-check --no-cache-dir install pylint black ipython \
+    && pip --disable-pip-version-check --no-cache-dir install pylint black rope ipython \
     #
     # Update Python environment based on requirements.txt
     && pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
