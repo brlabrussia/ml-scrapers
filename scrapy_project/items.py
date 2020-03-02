@@ -1,14 +1,19 @@
-# -*- coding: utf-8 -*-
-
-# Define here the models for your scraped items
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/items.html
-
 import scrapy
 
 
-class ScrapyProjectItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+# Same as in ratings_parser.models, might change later
+class Bookmaker(scrapy.Item):
+    external_id = scrapy.Field()
+    name = scrapy.Field()
+
+
+# Same as dict returned in collector.parsers.reviews_parsers, might change later
+class Review(scrapy.Item):
+    comment = scrapy.Field()
+    content = scrapy.Field()
+    create_dtime = scrapy.Field()
+    minuses = scrapy.Field()
+    pluses = scrapy.Field()
+    rating = scrapy.Field()
+    title = scrapy.Field()
+    username = scrapy.Field()
