@@ -4,7 +4,8 @@ from scrapy.exceptions import DropItem
 class NormalizeValuesPipeline(object):
     def process_item(self, item, spider):
         for key, value in item.items():
-            item[key] = value.strip()
+            if isinstance(value, str):
+                item[key] = value.strip()
         return item
 
 
