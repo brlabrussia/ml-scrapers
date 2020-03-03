@@ -11,6 +11,7 @@ from scrapy_project.items import Bookmaker
 class BookmakersSpider(scrapy.Spider):
     name = "bookmakers"
     allowed_domains = ["metaratings.ru"]
+    custom_settings = {"ITEM_PIPELINES": None}
 
     def start_requests(self):
         date = datetime.datetime.now().strftime("%d.%m.%Y")
