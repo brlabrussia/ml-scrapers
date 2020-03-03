@@ -11,14 +11,18 @@ class Bookmaker(scrapy.Item):
 
 # Same as dict returned in collector.parsers.reviews_parsers, might change later
 class Review(scrapy.Item):
-    comment = scrapy.Field()
+    bookmaker = scrapy.Field()
+    source = scrapy.Field()
+
     content = scrapy.Field()
-    create_dtime = scrapy.Field()
-    minuses = scrapy.Field()
-    pluses = scrapy.Field()
-    rating = scrapy.Field()
     title = scrapy.Field()
+    comment = scrapy.Field()
+    pluses = scrapy.Field()
+    minuses = scrapy.Field()
+
+    rating = scrapy.Field()
     username = scrapy.Field()
+    create_dtime = scrapy.Field()
 
 
 class ReviewLoader(ItemLoader):
