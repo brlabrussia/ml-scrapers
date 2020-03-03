@@ -1,7 +1,6 @@
 import json
 
 import scrapy
-from scrapy.loader import ItemLoader
 
 from scrapy_project.items import ReviewLoader
 
