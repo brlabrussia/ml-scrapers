@@ -1,6 +1,14 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import TakeFirst
+
+
+# Same as scrapy.loader.processors.TakeFirst, but blanks are acceptable
+def default_output_processor(self, values):
+    for value in values:
+        if value is not None and value != "":
+            return value
+    else:
+        return ""
 
 
 # Same as in ratings_parser.models, might change later
@@ -27,4 +35,4 @@ class Review(scrapy.Item):
 
 class ReviewLoader(ItemLoader):
     default_item_class = Review
-    default_output_processor = TakeFirst()
+    default_output_processor = default_output_processor
