@@ -14,5 +14,6 @@ RUN pip install -r /tmp/requirements.txt
 RUN pip install \
     black \
     ipython \
+    pip-tools \
     pylint \
     rope
