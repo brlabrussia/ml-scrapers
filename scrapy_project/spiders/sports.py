@@ -10,7 +10,6 @@ class SportsSpider(scrapy.Spider):
     name = "sports"
     source_name = "Sports.ru"
     allowed_domains = ["sports.ru"]
-    custom_settings = {"CONCURRENT_REQUESTS": 1, "ITEM_PIPELINES": None}
 
     def start_requests(self):
         url = "https://www.sports.ru/betting/ratings/"
