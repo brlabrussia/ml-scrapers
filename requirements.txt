@@ -10,7 +10,7 @@ cffi==1.14.0              # via cryptography
 constantly==15.1.0        # via twisted
 cryptography==2.8         # via pyopenssl, scrapy, service-identity
 cssselect==1.1.0          # via parsel, scrapy
-django==2.2.10            # via -r requirements.in
+dateparser==0.7.2         # via -r requirements.in
 hyperlink==19.0.0         # via twisted
 idna==2.9                 # via hyperlink
 incremental==17.5.0       # via twisted
@@ -23,13 +23,15 @@ pycparser==2.19           # via cffi
 pydispatcher==2.0.5       # via scrapy
 pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via scrapy
-pytz==2019.3              # via django
+python-dateutil==2.8.1    # via dateparser
+pytz==2019.3              # via dateparser, tzlocal
 queuelib==1.5.0           # via scrapy
+regex==2020.2.20          # via dateparser
 scrapy==1.8.0             # via -r requirements.in
 service-identity==18.1.0  # via scrapy
-six==1.14.0               # via automat, cryptography, parsel, protego, pyopenssl, scrapy, w3lib
-sqlparse==0.3.1           # via django
+six==1.14.0               # via automat, cryptography, parsel, protego, pyopenssl, python-dateutil, scrapy, w3lib
 twisted==19.10.0          # via scrapy
+tzlocal==2.0.0            # via dateparser
 w3lib==1.21.0             # via parsel, scrapy
 zope.interface==4.7.1     # via scrapy, twisted
 
