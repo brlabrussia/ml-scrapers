@@ -13,7 +13,5 @@
 	},
 	"extensions": [
 		"ms-python.python",
-		"eamodio.gitlens",
-		"visualstudioexptteam.vscodeintellicode"
 	],
 }
