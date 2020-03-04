@@ -1,9 +1,9 @@
 import datetime
 import hashlib
 import json
-import urllib
 
 import scrapy
+import w3lib.url
 
 from scrapy_project.items import Bookmaker
 
@@ -22,10 +22,11 @@ class BookmakersSpider(scrapy.Spider):
             "limit": 100,
             "offset": 0,
         }
-        url = self.build_url_from_params(params)
-        yield scrapy.Request(url, cb_kwargs={"params": params})
+        url = "https://metaratings.ru/api/"
+        url = w3lib.url.add_or_replace_parameters(url, params)
+        yield scrapy.Request(url)
 
-    def parse(self, response, params):
+    def parse(self, response):
         response_json = json.loads(response.body)
         elements = response_json.get("elements")
         for element in elements:
@@ -34,15 +35,12 @@ class BookmakersSpider(scrapy.Spider):
             bookmaker["name"] = element.get("name")
             yield bookmaker
 
-        next_offset = response_json.get("offset") + response_json.get("limit")
+        # Check whether more is available, prepare url
+        url = response.request.url
+        limit = int(w3lib.url.url_query_parameter(url, "limit"))
+        offset = int(w3lib.url.url_query_parameter(url, "offset"))
+        next_offset = offset + limit
         has_more = response_json.get("count") > next_offset
         if has_more:
-            params["offset"] = next_offset
-            url = self.build_url_from_params(params)
-            yield response.follow(url, callback=self.parse, cb_kwargs={"params": params})
-
-    @staticmethod
-    def build_url_from_params(params):
-        params_encoded = urllib.parse.urlencode(params)
-        url = "https://metaratings.ru/api/" + "?" + params_encoded
-        return url
+            url = w3lib.url.add_or_replace_parameter(url, "offset", next_offset)
+            yield response.follow(url)
