@@ -1,3 +1,4 @@
+import dateparser
 from scrapy.exceptions import DropItem
 
 
@@ -6,6 +7,17 @@ class NormalizeValuesPipeline(object):
         for key, value in item.items():
             if isinstance(value, str):
                 item[key] = value.strip()
+        return item
+
+
+class NormalizeDatePipeline(object):
+    def process_item(self, item, spider):
+        date = item.get("create_dtime")
+        date = dateparser.parse(date)
+        if date is None:
+            raise DropItem(f"Can't normalize date for {item}")
+        date = date.strftime("%Y-%m-%d %H:%M:%S")
+        item["create_dtime"] = date
         return item
 
 
