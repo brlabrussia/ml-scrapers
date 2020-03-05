@@ -13,7 +13,7 @@ RUN pip install -r /tmp/requirements.txt
 
 RUN pip install \
     black \
+    flake8 \
     ipython \
     pip-tools \
-    pylint \
     rope
