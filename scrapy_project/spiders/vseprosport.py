@@ -37,20 +37,12 @@ class VseprosportSpider(scrapy.Spider):
             return
         for review in reviews:
             loader = ReviewLoader(selector=review)
-
-            loader.add_value("bookmaker", bookmaker_name)
             loader.add_value("source", self.source_name)
-
-            loader.add_xpath("content", "./p[has-class('message')]/text()")
-            loader.add_value("title", "")
-            loader.add_value("comment", "")
-            loader.add_value("pluses", "")
-            loader.add_value("minuses", "")
-
+            loader.add_value("bookmaker", bookmaker_name)
             loader.add_xpath("rating", "./figure//div[has-class('star-rate')]/ul/b/text()", re=r"^(\d+)")
             loader.add_xpath("username", "./figure//h4/text()")
             loader.add_xpath("create_dtime", ".//p[has-class('date')]/text()")
-
+            loader.add_xpath("content", "./p[has-class('message')]/text()")
             yield loader.load_item()
 
         # Prepare url for page with next 5 reviews (offsetNews += 5)

@@ -35,21 +35,13 @@ class BookmakerratingsSpider(scrapy.Spider):
             return
         for review in reviews:
             loader = ReviewLoader(selector=review)
-
-            loader.add_value("bookmaker", bookmaker_name)
             loader.add_value("source", self.source_name)
-
-            loader.add_xpath("content", ".//div[has-class('content')]/div[has-class('text')]/*/text()")
-            loader.add_value("title", "")
-            loader.add_value("comment", "")
-            loader.add_value("pluses", "")
-            loader.add_value("minuses", "")
-
+            loader.add_value("bookmaker", bookmaker_name)
             loader.add_xpath("rating", ".//span[has-class('feedbacks-rating-stars')]/span[has-class('num')]/text()")
             loader.add_xpath("username", ".//a[has-class('namelink')]/text()")
             loader.add_value("username", "account is deleted")
             loader.add_xpath("create_dtime", ".//div[has-class('date')]/text()")
-
+            loader.add_xpath("content", ".//div[has-class('content')]/div[has-class('text')]/*/text()")
             yield loader.load_item()
 
         url = response.request.url

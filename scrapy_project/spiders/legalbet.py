@@ -25,20 +25,12 @@ class LegalbetSpider(scrapy.Spider):
         reviews = response.xpath(xp)
         for review in reviews:
             loader = ReviewLoader(selector=review)
-
-            loader.add_value("bookmaker", bookmaker_name)
             loader.add_value("source", self.source_name)
-
-            loader.add_value("content", "")
-            loader.add_value("title", "")
-            loader.add_value("comment", "")
-            loader.add_xpath("pluses", ".//div[has-class('icon-plus')]/following-sibling::div[has-class('description')][1]/text()")
-            loader.add_xpath("minuses", ".//div[has-class('icon-minus')]/following-sibling::div[has-class('description')][1]/text()")
-
-            loader.add_value("rating", "")
+            loader.add_value("bookmaker", bookmaker_name)
             loader.add_xpath("username", ".//div[has-class('author')]//a[has-class('name')]/text()")
             loader.add_xpath("create_dtime", ".//div[has-class('author')]//div[has-class('date')]/text()")
-
+            loader.add_xpath("pluses", ".//div[has-class('icon-plus')]/following-sibling::div[has-class('description')][1]/text()")
+            loader.add_xpath("minuses", ".//div[has-class('icon-minus')]/following-sibling::div[has-class('description')][1]/text()")
             yield loader.load_item()
 
         next_page = response.xpath("//a[@data-container-id='infinite-list']/@data-url").get()

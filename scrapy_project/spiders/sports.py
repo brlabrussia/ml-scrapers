@@ -28,20 +28,12 @@ class SportsSpider(scrapy.Spider):
         api_reviews = response_json.get("opinions")
         for api_review in api_reviews:
             loader = ReviewLoader()
-
-            loader.add_value("bookmaker", api_review.get("bookmaker").get("name"))
             loader.add_value("source", self.source_name)
-
-            loader.add_value("content", api_review.get("content"))
-            loader.add_value("title", "")
-            loader.add_value("comment", "")
-            loader.add_value("pluses", "")
-            loader.add_value("minuses", "")
-
+            loader.add_value("bookmaker", api_review.get("bookmaker").get("name"))
             loader.add_value("rating", api_review.get("user_rating"))
             loader.add_value("username", api_review.get("user").get("name"))
             loader.add_value("create_dtime", api_review.get("create_time").get("full"))
-
+            loader.add_value("content", api_review.get("content"))
             yield loader.load_item()
 
     @staticmethod

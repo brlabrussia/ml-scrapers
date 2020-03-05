@@ -28,21 +28,14 @@ class KushvsporteSpider(scrapy.Spider):
         reviews = response.xpath(xp)
         for review in reviews:
             loader = ReviewLoader(selector=review)
-
-            # TODO: format date
-            loader.add_value("bookmaker", bookmaker_name)
             loader.add_value("source", self.source_name)
-
-            loader.add_value("content", "")
-            loader.add_value("title", "")
-            loader.add_xpath("comment", ".//div[@itemprop='reviewBody']//p[3]/text()")
-            loader.add_xpath("pluses", ".//div[@itemprop='reviewBody']//p[1]/text()")
-            loader.add_xpath("minuses", ".//div[@itemprop='reviewBody']//p[2]/text()")
-
+            loader.add_value("bookmaker", bookmaker_name)
             loader.add_xpath("rating", ".//meta[@itemprop='ratingValue']/@content")
             loader.add_xpath("username", ".//div[has-class('infoUserRevievBK')]/*[@itemprop='name']/@title")
             loader.add_xpath("create_dtime", ".//meta[@itemprop='datePublished']/@datetime")
-
+            loader.add_xpath("pluses", ".//div[@itemprop='reviewBody']//p[1]/text()")
+            loader.add_xpath("minuses", ".//div[@itemprop='reviewBody']//p[2]/text()")
+            loader.add_xpath("comment", ".//div[@itemprop='reviewBody']//p[3]/text()")
             yield loader.load_item()
 
         xp = "//a[@id='list-reviews-pagination'][@data-urls!='[]']/@data-urls"

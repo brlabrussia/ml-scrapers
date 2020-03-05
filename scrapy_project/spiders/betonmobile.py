@@ -39,20 +39,11 @@ class BetonmobileSpider(scrapy.Spider):
             return
         for review in reviews:
             loader = ReviewLoader(selector=review)
-
-            loader.add_value("bookmaker", bookmaker_name)
             loader.add_value("source", self.source_name)
-
-            loader.add_xpath("content", "./div[has-class('comment-content')]/p/text()")
-            loader.add_value("title", "")
-            loader.add_value("comment", "")
-            loader.add_value("pluses", "")
-            loader.add_value("minuses", "")
-
-            loader.add_value("rating", "")
+            loader.add_value("bookmaker", bookmaker_name)
             loader.add_xpath("username", ".//div[has-class('comhed')]/p[has-class('comaut')]/text()")
             loader.add_xpath("create_dtime", "./div[has-class('comment-meta')]//time[@datetime]/@datetime")
-
+            loader.add_xpath("content", "./div[has-class('comment-content')]/p/text()")
             yield loader.load_item()
 
         url = response.request.url
