@@ -3,11 +3,11 @@ import scrapy
 from scrapy_project.items import ReviewLoader
 
 
-# TODO: limit requests, bookmaker pagination
 class BookmakerratingsSpider(scrapy.Spider):
     name = "bookmakerratings"
     source_name = "Рейтинг Букмекеров"
     allowed_domains = ["bookmaker-ratings.ru"]
+    custom_settings = {"CONCURRENT_REQUESTS": 4}
 
     def start_requests(self):
         url = "https://bookmaker-ratings.ru/bookmakers-homepage/vse-bukmekerskie-kontory/"
@@ -25,12 +25,14 @@ class BookmakerratingsSpider(scrapy.Spider):
                 "postID": bookmaker_id,
             }
             url = "https://bookmaker-ratings.ru/wp-admin/admin-ajax.php"
-            cb_kwargs = {"bookmaker_name": bookmaker_name}
+            cb_kwargs = {"bookmaker_name": bookmaker_name, "formdata": formdata}
             yield scrapy.FormRequest(url, formdata=formdata, callback=self.parse_reviews, cb_kwargs=cb_kwargs)
 
-    def parse_reviews(self, response, bookmaker_name):
+    def parse_reviews(self, response, bookmaker_name, formdata):
         xp = "//body/div[has-class('single')]"
         reviews = response.xpath(xp)
+        if not reviews:
+            return
         for review in reviews:
             loader = ReviewLoader(selector=review)
 
@@ -49,3 +51,10 @@ class BookmakerratingsSpider(scrapy.Spider):
             loader.add_xpath("create_dtime", ".//div[has-class('date')]/text()")
 
             yield loader.load_item()
+
+        url = response.request.url
+        page = int(formdata["page"])
+        page += 1
+        formdata["page"] = str(page)
+        cb_kwargs = {"bookmaker_name": bookmaker_name, "formdata": formdata}
+        yield scrapy.FormRequest(url, formdata=formdata, callback=self.parse_reviews, cb_kwargs=cb_kwargs)
