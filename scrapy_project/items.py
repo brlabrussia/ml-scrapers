@@ -15,7 +15,7 @@ def default_output_processor(self, values):
 # Same as in ratings_parser.models, might change later
 class Bookmaker(scrapy.Item):
     external_id = scrapy.Field()
-    name = scrapy.Field()
+    external_name = scrapy.Field()
 
 
 # Same as dict returned in collector.parsers.reviews_parsers, might change later
