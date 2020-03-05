@@ -5,6 +5,9 @@ from scrapy.loader.processors import Join, MapCompose, TakeFirst
 
 
 def format_date(date):
+    """
+    Take any scraped date and format it to ISO, return `None` on failure.
+    """
     settings = {"TIMEZONE": "Europe/Moscow", "RETURN_AS_TIMEZONE_AWARE": True}
     date = dateparser.parse(date, settings=settings)
     if date is None:
@@ -13,40 +16,42 @@ def format_date(date):
     return date
 
 
-# Same as in ratings_parser.models, might change later
-class Bookmaker(scrapy.Item):
-    external_id = scrapy.Field()
-    external_name = scrapy.Field()
-
-
-# Same as dict returned in collector.parsers.reviews_parsers, might change later
 class Review(scrapy.Item):
-    bookmaker = scrapy.Field()
+    """
+    Main item for any review site.
+    """
+
+    # Predefined name of the source which we scrape.
+    # Set as `source_name` attribute in every review spider.
     source = scrapy.Field()
 
-    content = scrapy.Field()
-    title = scrapy.Field()
-    comment = scrapy.Field()
-    pluses = scrapy.Field()
-    minuses = scrapy.Field()
-
+    # Name of reviewed bookmaker as it's written on the website.
+    bookmaker = scrapy.Field()
+    # Rating given by reviewer to reviewed bookmaker.
     rating = scrapy.Field()
     username = scrapy.Field()
     create_dtime = scrapy.Field()
 
+    # `title`, `comment`, `pluses` and `minuses` fields are only needed to build nicely
+    # formatted `content` field (if possible it's to parse them) with BuildContentPipeline.
+    # Otherwise scrape from page straight into `content` field.
+    content = scrapy.Field()
+    title = scrapy.Field()
+    pluses = scrapy.Field()
+    minuses = scrapy.Field()
+    comment = scrapy.Field()
+
 
 class ReviewLoader(ItemLoader):
+    """
+    Item Loader for `Review` item which is the main item for any review site.
+    """
+
     default_item_class = Review
+    default_input_processor = MapCompose(str.strip)
     default_output_processor = TakeFirst()
-
-    bookmaker_in = MapCompose(str.strip)
-
-    content_in = MapCompose(str.strip)
-    content_out = Join("")
-    title_in = MapCompose(str.strip)
-    comment_in = MapCompose(str.strip)
-    pluses_in = MapCompose(str.strip)
-    minuses_in = MapCompose(str.strip)
 
     rating_in = MapCompose(float)
     create_dtime_in = MapCompose(format_date)
+
+    content_out = Join("")

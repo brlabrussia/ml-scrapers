@@ -5,8 +5,6 @@ import json
 import scrapy
 import w3lib.url
 
-from scrapy_project.items import Bookmaker
-
 
 class MetaratingsSpider(scrapy.Spider):
     name = "metaratings"
@@ -30,10 +28,10 @@ class MetaratingsSpider(scrapy.Spider):
         response_json = json.loads(response.body)
         elements = response_json.get("elements")
         for element in elements:
-            bookmaker = Bookmaker()
-            bookmaker["external_id"] = element.get("id")
-            bookmaker["external_name"] = element.get("name")
-            yield bookmaker
+            yield {
+                "id": element.get("id"),
+                "name": element.get("name"),
+            }
 
         # Check whether more is available, prepare url
         url = response.request.url
