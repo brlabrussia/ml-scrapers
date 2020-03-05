@@ -1,5 +1,6 @@
 import scrapy
 from scrapy.loader import ItemLoader
+from scrapy.loader.processors import Join
 
 
 # Same as scrapy.loader.processors.TakeFirst, but blanks are acceptable
@@ -36,3 +37,5 @@ class Review(scrapy.Item):
 class ReviewLoader(ItemLoader):
     default_item_class = Review
     default_output_processor = default_output_processor
+
+    content_in = Join("")
