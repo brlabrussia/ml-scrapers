@@ -7,16 +7,16 @@ class LegalbetSpider(scrapy.Spider):
     name = "legalbet"
     source_name = "Legalbet"
     allowed_domains = ["legalbet.ru"]
+    scrape_bookmaker_full = False  # whether to scrape all reviews for bookmaker
 
     def start_requests(self):
         url = "https://legalbet.ru/bukmekerskye-kontory/"
         yield scrapy.Request(url, callback=self.parse_bookmakers)
 
     def parse_bookmakers(self, response):
-        xp = "//tr[@data-book-details-toggle and not(@class)]"
-        bookmaker_blocks = response.xpath(xp)
-        for bookmaker_block in bookmaker_blocks:
-            bookmaker_link = bookmaker_block.xpath(".//a[@title='Отзывы']/@href").get()
+        xp = "//tr[@data-book-details-toggle and not(@class)]//a[@title='Отзывы']/@href"
+        bookmaker_links = response.xpath(xp)
+        for bookmaker_link in bookmaker_links:
             yield response.follow(bookmaker_link, callback=self.parse_reviews)
 
     def parse_reviews(self, response):
@@ -33,6 +33,7 @@ class LegalbetSpider(scrapy.Spider):
             loader.add_xpath("minuses", ".//div[has-class('icon-minus')]/following-sibling::div[has-class('description')][1]/text()")
             yield loader.load_item()
 
-        next_page = response.xpath("//a[@data-container-id='infinite-list']/@data-url").get()
-        if next_page:
-            yield response.follow(next_page, callback=self.parse_reviews)
+        if self.scrape_bookmaker_full:
+            next_page = response.xpath("//a[@data-container-id='infinite-list']/@data-url").get()
+            if next_page:
+                yield response.follow(next_page, callback=self.parse_reviews)

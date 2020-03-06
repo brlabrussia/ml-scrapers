@@ -1,7 +1,7 @@
 import json
-import urllib
 
 import scrapy
+import w3lib.url
 
 from scrapy_project.items import ReviewLoader
 
@@ -20,7 +20,10 @@ class SportsSpider(scrapy.Spider):
         bookmaker_blocks = response.xpath(xp)
         for bookmaker_block in bookmaker_blocks:
             bookmaker_id = bookmaker_block.xpath(".//div[has-class('bets-stars')]/@data-id").get()
-            url = self.build_url_from_bookmaker_id(bookmaker_id)
+
+            params = {"args": f'{{"bookmaker_page_id":{bookmaker_id},"count":1000,"sort":"new"}}'}
+            url = "https://www.sports.ru/core/bookmaker/opinion/get/"
+            url = w3lib.url.add_or_replace_parameters(url, params)
             yield response.follow(url, callback=self.parse_reviews)
 
     def parse_reviews(self, response):
@@ -35,10 +38,3 @@ class SportsSpider(scrapy.Spider):
             loader.add_value("create_dtime", api_review.get("create_time").get("full"))
             loader.add_value("content", api_review.get("content"))
             yield loader.load_item()
-
-    @staticmethod
-    def build_url_from_bookmaker_id(bookmaker_id):
-        params = {"args": f'{{"bookmaker_page_id":{bookmaker_id},"count":1000,"sort":"new"}}'}
-        params_encoded = urllib.parse.urlencode(params)
-        url = "https://www.sports.ru/core/bookmaker/opinion/get/" + "?" + params_encoded
-        return url

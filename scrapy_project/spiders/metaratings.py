@@ -33,7 +33,6 @@ class MetaratingsSpider(scrapy.Spider):
                 "name": element.get("name"),
             }
 
-        # Check whether more is available, prepare url
         url = response.request.url
         limit = int(w3lib.url.url_query_parameter(url, "limit"))
         offset = int(w3lib.url.url_query_parameter(url, "offset"))
