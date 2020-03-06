@@ -27,10 +27,11 @@ python-dateutil==2.8.1    # via dateparser
 pytz==2019.3              # via dateparser, tzlocal
 queuelib==1.5.0           # via scrapy
 regex==2020.2.20          # via dateparser
-scrapy==1.8.0             # via -r requirements.in
+scrapy==1.8.0             # via -r requirements.in, scrapyd
+scrapyd==1.2.1            # via -r requirements.in
 service-identity==18.1.0  # via scrapy
-six==1.14.0               # via automat, cryptography, parsel, protego, pyopenssl, python-dateutil, scrapy, w3lib
-twisted==19.10.0          # via scrapy
+six==1.14.0               # via automat, cryptography, parsel, protego, pyopenssl, python-dateutil, scrapy, scrapyd, w3lib
+twisted==19.10.0          # via scrapy, scrapyd
 tzlocal==2.0.0            # via dateparser
 w3lib==1.21.0             # via parsel, scrapy
 zope.interface==4.7.1     # via scrapy, twisted
