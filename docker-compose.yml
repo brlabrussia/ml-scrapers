@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+    scrapy:
+        build: scrapy_project
+        command: scrapyd
+        ports:
+            - 6800:6800
+        depends_on:
+            - postgres
+    postgres:
+        image: postgres:12.2
+        environment:
+            POSTGRES_HOST_AUTH_METHOD: "trust"
+        ports:
+            - 5432:5432

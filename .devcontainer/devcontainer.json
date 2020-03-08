@@ -1,7 +1,10 @@
 {
-	"name": "Python 3",
-	"context": "..",
-	"dockerFile": "Dockerfile",
+	"dockerComposeFile": [
+		"..\\docker-compose.yml",
+		"docker-compose.yml"
+	],
+	"service": "scrapy",
+	"workspaceFolder": "/app/",
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "/usr/local/bin/python",
@@ -14,4 +17,6 @@
 	"extensions": [
 		"ms-python.python",
 	],
+	"postCreateCommand": "pip install black flake8 ipython pip-tools rope",
+	"shutdownAction": "stopCompose"
 }
