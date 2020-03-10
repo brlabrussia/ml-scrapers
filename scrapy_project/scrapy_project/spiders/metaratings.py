@@ -9,7 +9,7 @@ import w3lib.url
 class MetaratingsSpider(scrapy.Spider):
     name = "metaratings"
     allowed_domains = ["metaratings.ru"]
-    custom_settings = {"ITEM_PIPELINES": None}
+    custom_settings = {"ITEM_PIPELINES": {"scrapy_project.pipelines.PostgresPipeline": 200}}
 
     def start_requests(self):
         date = datetime.datetime.now().strftime("%d.%m.%Y")

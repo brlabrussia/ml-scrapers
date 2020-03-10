@@ -11,10 +11,11 @@ TELNETCONSOLE_ENABLED = False
 
 ITEM_PIPELINES = {
     "scrapy_project.pipelines.BuildContentPipeline": 1,
+    "scrapy_project.pipelines.PostgresPipeline": 200,
 }
 
-FEED_URI = "export"
-FEED_FORMAT = "jsonlines"
-FEED_EXPORT_ENCODING = "utf-8"
+# FEED_URI = "export"
+# FEED_FORMAT = "jsonlines"
+# FEED_EXPORT_ENCODING = "utf-8"
 
 LOG_LEVEL = "INFO"

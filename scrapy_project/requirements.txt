@@ -17,6 +17,7 @@ incremental==17.5.0       # via twisted
 lxml==4.5.0               # via parsel, scrapy
 parsel==1.5.2             # via scrapy
 protego==0.1.16           # via scrapy
+psycopg2==2.8.4           # via -r requirements.in
 pyasn1-modules==0.2.8     # via service-identity
 pyasn1==0.4.8             # via pyasn1-modules, service-identity
 pycparser==2.19           # via cffi
