@@ -1,6 +1,6 @@
 {
 	"dockerComposeFile": [
-		"..\\docker-compose.yml",
+		"../docker-compose.yml",
 		"docker-compose.yml"
 	],
 	"service": "scrapy",
@@ -12,7 +12,10 @@
 		"python.linting.flake8Enabled": true,
 		"python.linting.flake8Path": "/usr/local/bin/flake8",
 		"python.formatting.provider": "black",
-		"python.formatting.blackPath": "/usr/local/bin/black"
+		"python.formatting.blackPath": "/usr/local/bin/black",
+		"python.autoComplete.extraPaths": [
+			"scrapy_project"
+		]
 	},
 	"extensions": [
 		"ms-python.python",
