@@ -4,6 +4,8 @@ services:
     scrapy:
         build: scrapy_project
         command: scrapyd
+        environment:
+            PGPASSWORD: $POSTGRES_PASSWORD
         ports:
             - 6800:6800
         depends_on:
@@ -12,6 +14,8 @@ services:
     postgres:
         image: postgres:12.2
         environment:
-            POSTGRES_HOST_AUTH_METHOD: "trust"
+            POSTGRES_PASSWORD: $POSTGRES_PASSWORD
         ports:
             - 5432:5432
+        volumes:
+            - ./postgres/init:/docker-entrypoint-initdb.d/

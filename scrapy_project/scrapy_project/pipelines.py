@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 
 import psycopg2
 from scrapy.exceptions import DropItem
@@ -40,31 +41,36 @@ class PostgresPipeline(object):
 
     def open_spider(self, spider):
         # Basic setup and creation of table if it doesn't already exist
-        self.connection = psycopg2.connect(host="postgres", user="postgres", password="postgres", dbname="scrapy")
+        self.connection = psycopg2.connect(host="postgres", user="postgres", password=os.environ.get("PGPASSWORD"), dbname="scrapy")
         self.cursor = self.connection.cursor()
         self.cursor.execute(f"CREATE TABLE IF NOT EXISTS {spider.name} (id CHAR (32) PRIMARY KEY, item JSON);")
         self.connection.commit()
 
-        # Get ids for items we already have, set() is used for performance reasons
+        # Get ids for items we already have
         self.cursor.execute(f"SELECT id FROM {spider.name};")
-        self.ids_seen = set(id_ for id_, *_ in self.cursor.fetchall())
+        self.ids_seen = set(row[0] for row in self.cursor.fetchall())
 
     def close_spider(self, spider):
         self.cursor.close()
         self.connection.close()
 
     def process_item(self, item, spider):
-        # Bookmaker items
-        if item.get("id") is not None:
-            id_ = str(item.get("id"))
-        # Review items
-        elif item.get("content") is not None:
+        if item.get("content") is not None:  # Review items
             id_ = item.get("bookmaker") + item.get("username") + item.get("content")
+        elif item.get("id") is not None:  # Bookmaker items
+            id_ = str(item.get("id"))
+
         id_ = hashlib.md5(id_.encode()).hexdigest()
+
         if id_ in self.ids_seen:
             raise DropItem("Already in database")
         else:
             item_ = json.dumps(dict(item))
-            self.cursor.execute(f"INSERT INTO {spider.name} VALUES (%s, %s);", (id_, item_))
-            self.connection.commit()
+            try:
+                self.cursor.execute(f"INSERT INTO {spider.name} VALUES (%s, %s);", (id_, item_))
+                self.connection.commit()
+            except psycopg2.errors.InFailedSqlTransaction:
+                self.cursor.execute("ROLLBACK;")
+                raise DropItem("Insertion failed")
+
         return item
