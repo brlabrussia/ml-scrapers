@@ -1,5 +1,30 @@
-Usage
------
+Запуск
+------
+
+Из корня проекта
 ::
 
-    rm export log; scrapy list | xargs --max-args=1 scrapy crawl --logfile=log
+    docker-compose up
+
+или запускаем через VS Code Remote Containers, затем
+::
+
+    cd scrapy_project/ && scrapyd
+
+Использование
+-------------
+
+Сервис использует ``Scrapyd``, что дает `API <https://scrapyd.readthedocs.io/en/stable/api.html>`_ для получения списка скраперов, их запуска, мониторинга статуса (в т.ч. через веб-интерфейс http://localhost:6800/).
+
+Пример запроса:
+::
+
+    curl http://localhost:6800/schedule.json -d project=default -d spider=sports
+
+Используется пайплайн ``PostgresPipeline`` для экспорта собранных данных в БД ``scrapy``, таблицу с именем ``название-бота-в-scrapy`` (``self.name``), со схемой ``(id CHAR (32) PRIMARY KEY, item JSON)``.
+
+Планируется, что основное приложение будет периодически:
+    * получать список скраперов;
+    * поочередно их запускать;
+    * отслеживать статус каждого;
+    * по завершении импортировать собранный контент с применением необходимых обработок.
