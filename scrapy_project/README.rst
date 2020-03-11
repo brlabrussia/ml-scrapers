@@ -14,9 +14,9 @@
 Использование
 -------------
 
-Сервис использует ``Scrapyd``, что позволяет использовать `API <https://scrapyd.readthedocs.io/en/stable/api.html>`_ для получения списка и запуска скраперов, отслеживать статус выполнения.
+Сервис использует ``Scrapyd``, что дает `API <https://scrapyd.readthedocs.io/en/stable/api.html>`_ для получения списка скраперов, их запуска, мониторинга статуса (в т.ч. через веб-интерфейс http://localhost:6800/).
 
-Например:
+Пример запроса:
 ::
 
     curl http://localhost:6800/schedule.json -d project=default -d spider=sports
