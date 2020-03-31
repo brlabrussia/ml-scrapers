@@ -1,7 +1,7 @@
 import scrapy
 import w3lib.url
 
-from scrapy_project.items import ReviewLoader
+from sentiment_ru.items import ReviewLoader
 
 
 class VseprosportSpider(scrapy.Spider):

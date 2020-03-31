@@ -1,21 +1,18 @@
-version: "3"
+version: "3.7"
 
 services:
-    scrapy:
-        build: scrapy_project
-        command: scrapyd
-        environment:
-            PGPASSWORD: $POSTGRES_PASSWORD
+    scrapy_main:
+        container_name: scrapy_main
+        build: .
+        image: brl/scrapy
         ports:
             - 6800:6800
-        depends_on:
-            - postgres
+        networks:
+            - scrapy_network
+        command: scrapyd
+        restart: always
 
-    postgres:
-        image: postgres:12.2
-        environment:
-            POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-        ports:
-            - 5432:5432
-        volumes:
-            - ./postgres/init:/docker-entrypoint-initdb.d/
+networks:
+    scrapy_network:
+        name: scrapy_network
+        driver: bridge

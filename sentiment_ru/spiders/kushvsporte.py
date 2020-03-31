@@ -2,7 +2,7 @@ import json
 
 import scrapy
 
-from scrapy_project.items import ReviewLoader
+from sentiment_ru.items import ReviewLoader
 
 
 class KushvsporteSpider(scrapy.Spider):
