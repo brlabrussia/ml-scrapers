@@ -3,10 +3,12 @@ __pycache__
 *$py.class
 
 .vscode
+.mypy_cache
 
 export
 log
 
 dbs
+items
 logs
 twistd.pid

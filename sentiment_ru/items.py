@@ -12,34 +12,32 @@ def format_date(date):
     date = dateparser.parse(date, settings=settings)
     if date is None:
         return None
-    date = date.isoformat()
+    date = int(date.timestamp())
     return date
 
 
 class Review(scrapy.Item):
     """
     Main item for any review site.
+
+    `content_title`, `content_positive`, `content_negative` and `content_comment` fields are only needed
+    to build nicely formatted `content` field (if it's possible to parse them) with BuildContentPipeline.
+    Otherwise scrape from page straight into `content` field.
     """
 
-    # Predefined name of the source which we scrape.
-    # Set as `source_name` attribute in every review spider.
-    source = scrapy.Field()
-
-    # Name of reviewed bookmaker as it's written on the website.
-    bookmaker = scrapy.Field()
-    # Rating given by reviewer to reviewed bookmaker.
-    rating = scrapy.Field()
-    username = scrapy.Field()
-    create_dtime = scrapy.Field()
-
-    # `title`, `comment`, `pluses` and `minuses` fields are only needed to build nicely
-    # formatted `content` field (if possible it's to parse them) with BuildContentPipeline.
-    # Otherwise scrape from page straight into `content` field.
+    author = scrapy.Field()
     content = scrapy.Field()
-    title = scrapy.Field()
-    pluses = scrapy.Field()
-    minuses = scrapy.Field()
-    comment = scrapy.Field()
+    content_title = scrapy.Field()
+    content_positive = scrapy.Field()
+    content_negative = scrapy.Field()
+    content_comment = scrapy.Field()
+    rating = scrapy.Field()
+    rating_max = scrapy.Field()
+    rating_min = scrapy.Field()
+    subject = scrapy.Field()
+    time = scrapy.Field()
+    type = scrapy.Field()
+    url = scrapy.Field()
 
 
 class ReviewLoader(ItemLoader):
@@ -51,7 +49,8 @@ class ReviewLoader(ItemLoader):
     default_input_processor = MapCompose(str.strip)
     default_output_processor = TakeFirst()
 
-    rating_in = MapCompose(float)
-    create_dtime_in = MapCompose(format_date)
-
     content_out = Join("")
+    rating_in = MapCompose(float)
+    rating_max_in = MapCompose(float)
+    rating_min_in = MapCompose(float)
+    time_in = MapCompose(format_date)

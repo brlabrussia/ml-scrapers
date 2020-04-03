@@ -5,11 +5,20 @@ services:
         container_name: scrapy_main
         build: .
         image: brl/scrapy
+        volumes:
+            - .:/app/:cached
         ports:
             - 6800:6800
         networks:
             - scrapy_network
         command: scrapyd
+        restart: always
+
+    splash:
+        container_name: splash
+        image: scrapinghub/splash
+        ports:
+            - 8050:8050
         restart: always
 
 networks:

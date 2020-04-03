@@ -1,3 +1,5 @@
 scrapy~=1.8
+scrapy-splash~=0.7
 scrapyd~=1.2
 dateparser~=0.7
+requests~=2.23
