@@ -1,7 +1,11 @@
+from fake_useragent import UserAgent
+
 BOT_NAME = "sentiment_ru"
 
 SPIDER_MODULES = ["sentiment_ru.spiders"]
 NEWSPIDER_MODULE = "sentiment_ru.spiders"
+
+USER_AGENT = UserAgent().chrome
 
 ROBOTSTXT_OBEY = False
 
@@ -29,7 +33,7 @@ FEED_EXPORT_ENCODING = "utf-8"
 LOG_LEVEL = "INFO"
 
 # Splash-related settings
-SPLASH_URL = "http://splash:8050"
+SPLASH_URL = "http://splash:8050/"
 DUPEFILTER_CLASS = "scrapy_splash.SplashAwareDupeFilter"
 HTTPCACHE_STORAGE = "scrapy_splash.SplashAwareFSCacheStorage"
 

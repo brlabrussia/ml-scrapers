@@ -19,6 +19,8 @@ services:
         image: scrapinghub/splash
         ports:
             - 8050:8050
+        networks:
+            - scrapy_network
         restart: always
 
 networks:
