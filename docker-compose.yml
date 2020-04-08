@@ -10,7 +10,11 @@ services:
         ports:
             - 6800:6800
         networks:
+            - traefik_network
             - scrapy_network
+        labels:
+            - 'traefik.enable=true'
+            - 'traefik.http.routers.scrapy_main_http.rule=Host("$VIRTUAL_HOST")'            
         command: scrapyd
         restart: always
 
@@ -22,8 +26,13 @@ services:
         networks:
             - scrapy_network
         restart: always
+        depends_on:
+            - scrapy_main
 
 networks:
+    traefik_network:
+        external:
+          name: traefik_network
     scrapy_network:
         name: scrapy_network
         driver: bridge

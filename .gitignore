@@ -12,3 +12,4 @@ dbs
 items
 logs
 twistd.pid
+.env
