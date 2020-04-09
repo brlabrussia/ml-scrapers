@@ -38,7 +38,3 @@ SPIDER_MIDDLEWARES.update({
 })
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
-
-# Custom settings for WebhookPipeline
-WEBHOOK_URLS = ['https://httpbin.org/post']
-WEBHOOK_CHUNK_SIZE = 1000
