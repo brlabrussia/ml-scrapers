@@ -1,63 +1,49 @@
 import scrapy
-from scrapy.http import Response
+import scrapy_splash
 
 from sentiment_ru.items import ReviewLoader
 
 
 class BetonmobileSpider(scrapy.Spider):
-    name = "betonmobile"
-    allowed_domains = ["betonmobile.ru"]
-    scrape_bookmaker_full = False  # whether to scrape all reviews for bookmaker
+    name = 'betonmobile'
+    allowed_domains = ['betonmobile.ru']
+    custom_settings = {'CONCURRENT_REQUESTS': 1}
+
+    splash_args = {
+        'wait': 5,
+        'images': 0,
+    }
 
     def start_requests(self):
-        url = "https://betonmobile.ru/vse-bukmekerskie-kontory"
-        yield scrapy.Request(url, callback=self.parse_bookmakers)
+        url = 'https://betonmobile.ru/vse-bukmekerskie-kontory'
+        yield scrapy_splash.SplashRequest(
+            url,
+            self.parse_bookmakers,
+            args=self.splash_args,
+        )
 
-    def parse_bookmakers(self, response: Response):
-        xp = "//td[has-class('td-view')]/a/@href"
-        bookmaker_links = response.xpath(xp)
-        for bookmaker_link in bookmaker_links:
-            yield response.follow(bookmaker_link, callback=self.parse_bookmaker_info)
+    def parse_bookmakers(self, response):
+        bookmaker_blocks = response.css('.rb-tbody > tr')
+        for bb in bookmaker_blocks:
+            comments = bb.css('.td-comments span::text').get()
+            if comments == '0':
+                continue
+            link = bb.css('.td-view > a::attr(href)').get()
+            yield scrapy_splash.SplashRequest(
+                link,
+                self.parse_reviews,
+                args=self.splash_args,
+            )
 
-    def parse_bookmaker_info(self, response: Response):
-        bookmaker_id = response.xpath("//link[@rel='shortlink']/@href").get()
-        bookmaker_id = bookmaker_id.split("?p=")[-1]
-        bookmaker_name = response.xpath("//h1[has-class('section-title')]/text()").get()
-
-        url = "https://betonmobile.ru/wp-admin/admin-ajax.php"
-        formdata = {
-            "action": "cloadmore",
-            "post_id": bookmaker_id,
-            "cpage": "1",
-        }
-        cb_kwargs = {
-            "formdata": formdata,
-            "bookmaker_name": bookmaker_name,
-        }
-        yield scrapy.FormRequest(url, formdata=formdata, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
-
-    def parse_reviews(self, response: Response, formdata: dict, bookmaker_name: str):
-        xp = "//body/li/div[has-class('comment')]"
-        review_blocks = response.xpath(xp)
-        if not review_blocks:
-            return
-        for review_block in review_blocks:
-            loader = ReviewLoader(selector=review_block)
-            loader.add_xpath("author", ".//div[has-class('comhed')]/p[has-class('comaut')]/text()")
-            loader.add_xpath("content", "./div[has-class('comment-content')]/p/text()")
-            loader.add_value("subject", bookmaker_name)
-            loader.add_xpath("time", "./div[has-class('comment-meta')]//time[@datetime]/@datetime")
-            loader.add_value("type", "review")
-            loader.add_value("url", response.request.url)
+    def parse_reviews(self, response):
+        subject = response.css('.section-title::text').get()
+        review_blocks = response.css('.commentlist > li.comment > div.comment')
+        for rb in review_blocks:
+            loader = ReviewLoader(selector=rb)
+            loader.add_css('author', '.comhed > .comaut::text')
+            loader.add_css('content', '.comment-content > p::text')
+            loader.add_value('subject', subject)
+            loader.add_css('time', '.comment-meta time::attr(datetime)')
+            loader.add_value('type', 'review')
+            loader.add_value('url', response.url)
             yield loader.load_item()
-
-        if self.scrape_bookmaker_full:
-            url = response.request.url
-            page = int(formdata["cpage"])
-            page += 1
-            formdata["cpage"] = str(page)
-            cb_kwargs = {
-                "formdata": formdata,
-                "bookmaker_name": bookmaker_name,
-            }
-            yield scrapy.FormRequest(url, formdata=formdata, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
