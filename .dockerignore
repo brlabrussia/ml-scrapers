@@ -1,2 +1,16 @@
+**__pycache__/
+*.py[cod]
+*$py.class
+
+.git/
+.vscode/
+.mypy_cache/
+*venv*/
 .dockerignore
-venv*/
+.gitignore
+[dD]ocker*
+
+dbs/
+items/
+logs/
+twistd.pid
