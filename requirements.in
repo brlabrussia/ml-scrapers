@@ -1,7 +1,7 @@
-scrapyd~=1.2
-scrapy~=1.8
-scrapy-splash~=0.7
-scrapy-rotating-proxies~=0.6
-fake-useragent~=0.1
-dateparser~=0.7
-requests~=2.23
+scrapyd==1.2.*
+scrapy==1.8.*
+scrapy-splash==0.7.*
+scrapy-rotating-proxies==0.6.*
+fake-useragent==0.1.*
+dateparser==0.7.*
+requests==2.23.*
