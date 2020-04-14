@@ -4,8 +4,8 @@ services:
     scrapy:
         build: .
         image: brl/scrapy
-        # volumes:
-        #     - .:/app/:cached
+        volumes:
+            - .:/app/:cached
         ports:
             - 6800:6800
         networks:
