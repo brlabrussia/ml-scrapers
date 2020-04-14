@@ -12,7 +12,7 @@ def format_date(date):
     date = dateparser.parse(date, settings=settings)
     if date is None:
         return None
-    date = int(date.timestamp())
+    date = date.isoformat()
     return date
 
 
