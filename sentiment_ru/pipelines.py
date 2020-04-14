@@ -70,7 +70,6 @@ class WebhookPipeline(object):
     def open_spider(self, spider):
         self.posts: List[Post] = []
         self.client = requests.Session()
-        self.logger = spider.logger  # TODO
 
     def process_item(self, item, spider):
         post = dict(item)
@@ -86,8 +85,7 @@ class WebhookPipeline(object):
         self.client.close()
 
     def send_posts(self):
-        r = self.client.post(self.url, json=self.posts)
-        self.logger.info(r.json())  # TODO
+        self.client.post(self.url, json=self.posts)
         self.posts.clear()
 
     @staticmethod
