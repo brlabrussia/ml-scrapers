@@ -1,14 +1,13 @@
-from datetime import datetime
 from typing import Dict, List, Union
 from urllib.parse import urlparse
 
 import requests
 from scrapy.exceptions import DropItem, NotConfigured
 
-Post = Dict[str, Union[str, float, None]]
+ReviewData = Dict[str, Union[str, float, None]]
 
 
-class BuildContentPipeline(object):
+class BuildContentPipeline:
     """
     Try to build `content` field from secondary fields: (`content_title`,
     `content_positive`, `content_negative` and `content_comment`), ~~pop them
@@ -37,7 +36,7 @@ class BuildContentPipeline(object):
         return item
 
 
-class WebhookPipeline(object):
+class WebhookPipeline:
     """
     Sends scraped posts in chunks (`spider.webhook_chunk_size`)
     to url (`spider.webhook_url`).
@@ -68,7 +67,7 @@ class WebhookPipeline(object):
             self.compat = True
 
     def open_spider(self, spider):
-        self.posts: List[Post] = []
+        self.posts: List[ReviewData] = []
         self.client = requests.Session()
 
     def process_item(self, item, spider):
@@ -89,10 +88,7 @@ class WebhookPipeline(object):
         self.posts.clear()
 
     @staticmethod
-    def adapt_schema(post: Post) -> Post:
-        time = post.get("time")
-        create_dtime = datetime.fromisoformat(time).strftime("%Y-%m-%d %H:%M:%S")
-
+    def adapt_schema(post: ReviewData) -> ReviewData:
         host_source_matches = {
             "betonmobile.ru": "Betonmobile",
             "bookmaker-ratings.ru": "Рейтинг Букмекеров",
@@ -101,18 +97,19 @@ class WebhookPipeline(object):
             "sports.ru": "Sports.ru",
             "vseprosport.ru": "ВсеПроСпорт.ру",
         }
-        host = urlparse(post.get("url")).netloc.replace("www.", "")
+        host = urlparse(post.get("url")).netloc.replace("www.", "")  # type: ignore
         source = host_source_matches.get(host)
 
         return {
             "bookmaker": post.get("subject"),
             "comment": post.get("content_comment"),
             "content": post.get("content"),
-            "create_dtime": create_dtime,
+            "create_dtime": post.get("time"),
             "minuses": post.get("content_negative"),
             "pluses": post.get("content_positive"),
             "rating": post.get("rating"),
             "source": source,
             "title": post.get("content_title"),
-            "username": post.get("author"),
+            "username": post.get("author")
+            or "account is deleted",  # bookmakerratings legacy
         }
