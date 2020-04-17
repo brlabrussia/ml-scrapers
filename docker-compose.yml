@@ -1,38 +1,32 @@
-version: "3.7"
+version: '3'
 
 services:
-    scrapy_main:
-        container_name: scrapy_main
-        build: .
-        image: brl/scrapy
-        volumes:
-            - .:/app/:cached
-        ports:
-            - 6800:6800
-        networks:
-            - traefik_network
-            - scrapy_network
-        labels:
-            - 'traefik.enable=true'
-            - 'traefik.http.routers.scrapy_main_http.rule=Host("$VIRTUAL_HOST")'            
-        command: scrapyd
-        restart: always
+  scrapy:
+    build: .
+    image: brl/scrapy
+    volumes:
+      - .:/app/:cached
+    ports:
+      - 6800:6800
+    networks:
+      - traefik_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.scrapy_http.rule=Host("$VIRTUAL_HOST")
+      - traefik.http.routers.scrapy_http.middlewares=scrapy_auth
+      - traefik.http.middlewares.scrapy_auth.basicauth.usersfile=/etc/traefik/.htpasswd
+    command: scrapyd
+    restart: always
 
-    splash:
-        container_name: splash
-        image: scrapinghub/splash
-        ports:
-            - 8050:8050
-        networks:
-            - scrapy_network
-        restart: always
-        depends_on:
-            - scrapy_main
+  splash:
+    image: scrapinghub/splash
+    ports:
+      - 8050:8050
+    restart: always
+    depends_on:
+      - scrapy
 
 networks:
-    traefik_network:
-        external:
-          name: traefik_network
-    scrapy_network:
-        name: scrapy_network
-        driver: bridge
+  traefik_network:
+    external:
+      name: traefik_network
