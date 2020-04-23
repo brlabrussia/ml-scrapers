@@ -8,7 +8,7 @@ def format_date(date):
     """
     Take any scraped date and format it to ISO, return `None` on failure.
     """
-    settings = {"TIMEZONE": "Europe/Moscow", "RETURN_AS_TIMEZONE_AWARE": True}
+    settings = {'TIMEZONE': 'Europe/Moscow', 'RETURN_AS_TIMEZONE_AWARE': True}
     date = dateparser.parse(date, settings=settings)
     if date is None:
         return None
@@ -49,7 +49,7 @@ class ReviewLoader(ItemLoader):
     default_input_processor = MapCompose(str.strip)
     default_output_processor = TakeFirst()
 
-    content_out = Join("")
+    content_out = Join('')
     rating_in = MapCompose(float)
     rating_max_in = MapCompose(float)
     rating_min_in = MapCompose(float)

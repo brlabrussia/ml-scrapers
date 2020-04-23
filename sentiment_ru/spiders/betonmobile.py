@@ -8,11 +8,7 @@ class BetonmobileSpider(scrapy.Spider):
     name = 'betonmobile'
     allowed_domains = ['betonmobile.ru']
     custom_settings = {'CONCURRENT_REQUESTS': 1}
-
-    splash_args = {
-        'wait': 5,
-        'images': 0,
-    }
+    splash_args = {'wait': 5, 'images': 0}
 
     def start_requests(self):
         url = 'https://betonmobile.ru/vse-bukmekerskie-kontory'
@@ -39,11 +35,11 @@ class BetonmobileSpider(scrapy.Spider):
         subject = response.css('.section-title::text').get()
         review_blocks = response.css('.commentlist > li.comment > div.comment')
         for rb in review_blocks:
-            loader = ReviewLoader(selector=rb)
-            loader.add_css('author', '.comhed > .comaut::text')
-            loader.add_css('content', '.comment-content > p::text')
-            loader.add_value('subject', subject)
-            loader.add_css('time', '.comment-meta time::attr(datetime)')
-            loader.add_value('type', 'review')
-            loader.add_value('url', response.url)
-            yield loader.load_item()
+            rl = ReviewLoader(selector=rb)
+            rl.add_css('author', '.comhed > .comaut::text')
+            rl.add_css('content', '.comment-content > p::text')
+            rl.add_value('subject', subject)
+            rl.add_css('time', '.comment-meta time::attr(datetime)')
+            rl.add_value('type', 'review')
+            rl.add_value('url', response.url)
+            yield rl.load_item()
