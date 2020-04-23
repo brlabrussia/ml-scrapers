@@ -90,6 +90,7 @@ class WebhookPipeline:
     @staticmethod
     def adapt_schema(post: ReviewData) -> ReviewData:
         host_source_matches = {
+            'apps.apple.com': 'Itunes.apple.com',
             'betonmobile.ru': 'Betonmobile',
             'bookmaker-ratings.ru': 'Рейтинг Букмекеров',
             'kushvsporte.ru': 'Kush v sporte',
