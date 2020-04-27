@@ -1,59 +1,54 @@
 import scrapy
-import w3lib.url
-from scrapy.http import Response
+from furl import furl
 
 from sentiment_ru.items import ReviewLoader
 
 
 class VseprosportSpider(scrapy.Spider):
-    name = "vseprosport"
-    allowed_domains = ["vseprosport.ru"]
-    scrape_bookmaker_full = False  # whether to scrape all reviews for bookmaker
+    name = 'vseprosport'
+    allowed_domains = ['vseprosport.ru']
+    crawl_deep = False
 
     def start_requests(self):
-        url = "https://www.vseprosport.ru/reyting-bukmekerov/"
-        yield scrapy.Request(url, callback=self.parse_bookmakers)
+        url = 'https://www.vseprosport.ru/reyting-bukmekerov/'
+        yield scrapy.Request(url, callback=self.parse_subjects)
 
-    def parse_bookmakers(self, response: Response):
-        xp = "//div[has-class('bookmeker_table_offer')]"
-        bookmaker_blocks = response.xpath(xp)
-        for bookmaker_block in bookmaker_blocks:
-            bookmaker_url = "https://www.vseprosport.ru"
-            bookmaker_url += bookmaker_block.xpath(".//div[has-class('bookmeker_table_offer_button')]//a/@href").get()
-            bookmaker_id = bookmaker_url.split("/")[-1]
-            bookmaker_name = bookmaker_block.xpath(".//div[has-class('bookmeker_table_offer_logo')]//img/@title").get()
+    def parse_subjects(self, response):
+        subject_blocks = response.css('.bookmeker_table_offer')
+        for sb in subject_blocks:
+            subject_url = sb.css('.bookmeker_table_offer_button a::attr(href)').get()
+            subject_id = subject_url.split('/')[-1]
+            subject_name = sb.css('.bookmeker_table_offer_logo img::attr(title)').get()
 
-            params = {
-                "book": bookmaker_id,
-                "offsetNews": 0,
-            }
-            url = "https://www.vseprosport.ru/get-bookmaker-comments-html"
-            url = w3lib.url.add_or_replace_parameters(url, params)
-            cb_kwargs = {"bookmaker_name": bookmaker_name, "bookmaker_url": bookmaker_url}
-            yield response.follow(url, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
+            url = 'https://www.vseprosport.ru/get-bookmaker-comments-html'
+            query = {'book': subject_id, 'offsetNews': 0}
+            yield response.follow(
+                url=furl(url, query=query).url,
+                callback=self.parse_reviews,
+                cb_kwargs={
+                    'subject_name': subject_name,
+                    'subject_url': subject_url,
+                },
+            )
 
-    def parse_reviews(self, response: Response, bookmaker_name: str, bookmaker_url: str):
-        xp = "//body/li"
-        review_blocks = response.xpath(xp)
+    def parse_reviews(self, response, subject_name: str, subject_url: str):
+        review_blocks = response.css('body > li')
         if not review_blocks:
             return
-        for review_block in review_blocks:
-            loader = ReviewLoader(selector=review_block)
-            loader.add_xpath("author", "./figure//h4/text()")
-            loader.add_xpath("content", "./p[has-class('message')]/text()")
-            loader.add_xpath("rating", "./figure//div[has-class('star-rate')]/ul/b/text()", re=r"^(\d+)")
-            loader.add_value("rating_max", 5)
-            loader.add_value("rating_min", 1)
-            loader.add_value("subject", bookmaker_name)
-            loader.add_xpath("time", ".//p[has-class('date')]/text()")
-            loader.add_value("type", "review")
-            loader.add_value("url", bookmaker_url)
-            yield loader.load_item()
+        for rb in review_blocks:
+            rl = ReviewLoader(selector=rb)
+            rl.add_xpath('author', './figure//h4/text()')
+            rl.add_xpath('content', './p[has-class("message")]/text()')
+            rl.add_xpath('rating', './figure//div[has-class("star-rate")]/ul/b/text()', re=r'^(\d+)')
+            rl.add_value('rating_max', 5)
+            rl.add_value('rating_min', 1)
+            rl.add_value('subject', subject_name)
+            rl.add_xpath('time', './/p[has-class("date")]/text()')
+            rl.add_value('type', 'review')
+            rl.add_value('url', response.urljoin(subject_url))
+            yield rl.load_item()
 
-        if self.scrape_bookmaker_full:
-            url = response.request.url
-            offset = int(w3lib.url.url_query_parameter(url, "offsetNews"))
-            next_offset = offset + 5
-            url = w3lib.url.add_or_replace_parameter(url, "offsetNews", next_offset)
-            cb_kwargs = {"bookmaker_name": bookmaker_name}
-            yield response.follow(url, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
+        if self.crawl_deep:
+            f = furl(response.request.url)
+            f.args['offsetNews'] = int(f.args['offsetNews']) + 5
+            yield response.request.replace(url=f.url)

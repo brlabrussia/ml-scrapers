@@ -1,51 +1,54 @@
 import json
 
 import scrapy
-from scrapy.http import Response
 
 from sentiment_ru.items import ReviewLoader
 
 
 class KushvsporteSpider(scrapy.Spider):
-    name = "kushvsporte"
-    allowed_domains = ["kushvsporte.ru"]
-    scrape_bookmaker_full = False  # whether to scrape all reviews for bookmaker
+    name = 'kushvsporte'
+    allowed_domains = ['kushvsporte.ru']
+    crawl_deep = False
 
     def start_requests(self):
-        url = "https://kushvsporte.ru/bookmaker/rating"
-        yield scrapy.Request(url, callback=self.parse_bookmakers)
+        url = 'https://kushvsporte.ru/bookmaker/rating'
+        yield scrapy.Request(url, self.parse_subjects)
 
-    def parse_bookmakers(self, response: Response):
-        xp = "//div[has-class('blockBkList')]/*"
-        bookmaker_blocks = response.xpath(xp)
-        for bookmaker_block in bookmaker_blocks:
-            bookmaker_name = bookmaker_block.xpath(".//h3/text()").get()
-            bookmaker_link = bookmaker_block.xpath(".//a[@class='medium']/@href").get()
-            cb_kwargs = {"bookmaker_name": bookmaker_name}
-            yield response.follow(bookmaker_link, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
+    def parse_subjects(self, response):
+        subject_blocks = response.css('.blockBkList > *')
+        for sb in subject_blocks:
+            subject_name = sb.css('h3::text').get()
+            subject_url = sb.css('a.medium::attr(href)').get()
+            yield response.follow(
+                subject_url,
+                self.parse_reviews,
+                cb_kwargs={'subject_name': subject_name},
+            )
 
-    def parse_reviews(self, response: Response, bookmaker_name: str):
-        xp = "//*[@id='reviews-block']/div[has-class('review')]"
-        review_blocks = response.xpath(xp)
-        for review_block in review_blocks:
-            loader = ReviewLoader(selector=review_block)
-            loader.add_xpath("author", ".//div[has-class('infoUserRevievBK')]/*[@itemprop='name']/@title")
-            loader.add_xpath("content_positive", ".//div[@itemprop='reviewBody']//p[1]/text()")
-            loader.add_xpath("content_negative", ".//div[@itemprop='reviewBody']//p[2]/text()")
-            loader.add_xpath("content_comment", ".//div[@itemprop='reviewBody']//p[3]/text()")
-            loader.add_xpath("rating", ".//meta[@itemprop='ratingValue']/@content")
-            loader.add_value("rating_max", 5)
-            loader.add_value("rating_min", 1)
-            loader.add_value("subject", bookmaker_name)
-            loader.add_xpath("time", ".//meta[@itemprop='datePublished']/@datetime")
-            loader.add_value("type", "review")
-            loader.add_value("url", response.request.url)
-            yield loader.load_item()
+    def parse_reviews(self, response, subject_name: str):
+        review_blocks = response.css('#reviews-block > .review')
+        for rb in review_blocks:
+            rl = ReviewLoader(selector=rb)
+            rl.add_css('author', '.infoUserRevievBK [itemprop=name]::attr(title)')
+            rl.add_css('content_positive', '[itemprop=reviewBody] p:nth-of-type(1)::text')
+            rl.add_css('content_negative', '[itemprop=reviewBody] p:nth-of-type(2)::text')
+            rl.add_css('content_comment', '[itemprop=reviewBody] p:nth-of-type(3)::text')
+            rl.add_css('rating', '[itemprop=ratingValue]::attr(content)')
+            rl.add_value('rating_max', 5)
+            rl.add_value('rating_min', 1)
+            rl.add_value('subject', subject_name)
+            rl.add_css('time', '[itemprop=datePublished]::attr(datetime)')
+            rl.add_value('type', 'review')
+            rl.add_value('url', response.url)
+            yield rl.load_item()
 
-        if self.scrape_bookmaker_full:
-            xp = "//a[@id='list-reviews-pagination'][@data-urls!='[]']/@data-urls"
-            next_page = response.xpath(xp).get()
-            if next_page:
-                next_page = json.loads(next_page)[0]
-                cb_kwargs = {"bookmaker_name": bookmaker_name}
-                yield response.follow(next_page, cb_kwargs=cb_kwargs, callback=self.parse_reviews)
+        css = '#list-reviews-pagination:not([data-urls="[]"])::attr(data-urls)'
+        next_page = response.css(css).get()
+        if self.crawl_deep and next_page:
+            next_page = json.loads(next_page)[0]
+            cb_kwargs = {'subject_name': subject_name}
+            yield response.follow(
+                next_page,
+                self.parse_reviews,
+                cb_kwargs=cb_kwargs,
+            )
