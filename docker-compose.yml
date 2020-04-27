@@ -22,6 +22,8 @@ services:
     image: scrapinghub/splash:3.4.1
     ports:
       - 8050:8050
+    networks:
+      - traefik_network
     command: --max-timeout 15 --maxrss 500
     restart: always
     depends_on:
