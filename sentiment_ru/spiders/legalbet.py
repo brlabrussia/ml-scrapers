@@ -23,6 +23,7 @@ class LegalbetSpider(scrapy.Spider):
         review_blocks = response.css('div.review')
         for rb in review_blocks:
             rl = ReviewLoader(selector=rb)
+            rl.add_css('id', '::attr(id)', re=r'\d+$')
             rl.add_css('author', '.author a.name::text')
             rl.add_css('content_positive', '.icon-plus + .description::text')
             rl.add_css('content_negative', '.icon-minus + .description::text')

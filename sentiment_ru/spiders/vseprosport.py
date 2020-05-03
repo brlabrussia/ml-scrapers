@@ -37,6 +37,7 @@ class VseprosportSpider(scrapy.Spider):
             return
         for rb in review_blocks:
             rl = ReviewLoader(selector=rb)
+            rl.add_css('id', '.answers::attr(data-vps-comment-list)', re=r'\d+$')
             rl.add_xpath('author', './figure//h4/text()')
             rl.add_xpath('content', './p[has-class("message")]/text()')
             rl.add_xpath('rating', './figure//div[has-class("star-rate")]/ul/b/text()', re=r'^(\d+)')

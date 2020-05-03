@@ -36,6 +36,7 @@ class BetonmobileSpider(scrapy.Spider):
         review_blocks = response.css('.commentlist > li.comment > div.comment')
         for rb in review_blocks:
             rl = ReviewLoader(selector=rb)
+            rl.add_css('id', '::attr(id)', re=r'\d+$')
             rl.add_css('author', '.comhed > .comaut::text')
             rl.add_css('content', '.comment-content > p::text')
             rl.add_value('subject', subject)

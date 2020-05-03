@@ -64,6 +64,7 @@ class ItunesSpider(scrapy.Spider):
         for ar in api_reviews:
             attrs = ar.get('attributes')
             rl = ReviewLoader()
+            rl.add_value('id', ar.get('id'))
             rl.add_value('author', attrs.get('userName'))
             rl.add_value('content', attrs.get('review'))
             rl.add_value('content_title', attrs.get('title'))

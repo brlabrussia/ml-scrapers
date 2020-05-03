@@ -7,7 +7,7 @@ from sentiment_ru.items import ReviewLoader
 class BookmakerratingsSpider(scrapy.Spider):
     name = 'bookmakerratings'
     allowed_domains = ['bookmaker-ratings.ru']
-    custom_settings = {'CONCURRENT_REQUESTS': 4}  # avoid HTTP 429
+    custom_settings = {'CONCURRENT_REQUESTS': 4}
     crawl_deep = False
 
     def start_requests(self):
@@ -38,6 +38,7 @@ class BookmakerratingsSpider(scrapy.Spider):
             return
         for rb in review_blocks:
             rl = ReviewLoader(selector=rb)
+            rl.add_css('id', '::attr(id)', re=r'\d+$')
             rl.add_css('author', '.namelink::text')
             rl.add_css('content', '.content .text > *::text')
             rl.add_css('rating', '.feedbacks-rating-stars .num::text')

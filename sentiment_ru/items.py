@@ -25,6 +25,7 @@ class Review(scrapy.Item):
     Otherwise scrape from page straight into `content` field.
     """
 
+    id = scrapy.Field()
     author = scrapy.Field()
     content = scrapy.Field()
     content_title = scrapy.Field()
@@ -49,6 +50,7 @@ class ReviewLoader(ItemLoader):
     default_input_processor = MapCompose(str.strip)
     default_output_processor = TakeFirst()
 
+    id_in = MapCompose(str)
     content_out = Join('')
     rating_in = MapCompose(float)
     rating_max_in = MapCompose(float)

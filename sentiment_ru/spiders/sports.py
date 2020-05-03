@@ -33,6 +33,7 @@ class SportsSpider(scrapy.Spider):
         api_reviews = response_json.get('opinions')
         for ar in api_reviews:
             rl = ReviewLoader()
+            rl.add_value('id', ar.get('id'))
             rl.add_value('author', ar.get('user').get('name'))
             rl.add_value('content', ar.get('content'))
             rl.add_value('rating', ar.get('user_rating'))

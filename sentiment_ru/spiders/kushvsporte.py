@@ -29,6 +29,7 @@ class KushvsporteSpider(scrapy.Spider):
         review_blocks = response.css('#reviews-block > .review')
         for rb in review_blocks:
             rl = ReviewLoader(selector=rb)
+            rl.add_css('id', '[itemprop=reviewBody] > div::attr(id)', re=r'review(\d+)$')
             rl.add_css('author', '.infoUserRevievBK [itemprop=name]::attr(title)')
             rl.add_css('content_positive', '[itemprop=reviewBody] p:nth-of-type(1)::text')
             rl.add_css('content_negative', '[itemprop=reviewBody] p:nth-of-type(2)::text')
