@@ -26,6 +26,13 @@ FEED_EXPORT_ENCODING = 'utf-8'
 
 LOG_LEVEL = 'INFO'
 
+# Proxy settings https://github.com/TeamHG-Memex/scrapy-rotating-proxies
+ROTATING_PROXY_LIST_PATH = 'proxies.txt'
+DOWNLOADER_MIDDLEWARES.update({
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+})
+
 # Splash settings https://github.com/scrapy-plugins/scrapy-splash
 SPLASH_URL = 'http://splash:8050/'
 DOWNLOADER_MIDDLEWARES.update({
