@@ -102,14 +102,14 @@ class WebhookPipeline:
         source = host_source_matches.get(host)
 
         return {
-            'bookmaker': post.get('subject'),
-            'comment': post.get('content_comment'),
-            'content': post.get('content'),
-            'create_dtime': post.get('time'),
-            'minuses': post.get('content_negative'),
-            'pluses': post.get('content_positive'),
+            'bookmaker': post.get('subject', ''),
+            'comment': post.get('content_comment', ''),
+            'content': post.get('content', ''),
+            'create_dtime': post.get('time', ''),
+            'minuses': post.get('content_negative', ''),
+            'pluses': post.get('content_positive', ''),
             'rating': post.get('rating'),
             'source': source,
-            'title': post.get('content_title'),
-            'username': post.get('author') or 'account is deleted',  # bookmakerratings legacy
+            'title': post.get('content_title', ''),
+            'username': post.get('author', 'account is deleted'),  # bookmakerratings legacy
         }
