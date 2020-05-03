@@ -1,5 +1,5 @@
 ## Требования
-[Traefik](https://github.com/weirdname404/traefik-daemon "Traefik")
+- [`Traefik`](https://github.com/weirdname404/traefik-daemon "Traefik")
 
 ## Quick Start
 ```shell
@@ -10,8 +10,8 @@ curl http://localhost:6800/schedule.json -d project=sentiment_ru -d spider=itune
 Админка http://localhost:6800/
 
 ## Технологии
-[Scrapy](https://docs.scrapy.org/en/latest/ "Scrapy")
-[furl](https://github.com/gruns/furl "furl") для работы с парметрами запроса
+- [`Scrapy`](https://docs.scrapy.org/en/latest/ "Scrapy")
+- [`furl`](https://github.com/gruns/furl "furl") для работы с параметрами запроса
 
 ## API
 Поддерживаются [эндпоинты scrapyd](https://scrapyd.readthedocs.io/en/stable/api.html "эндпоинты scrapyd"), причем [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json") расширен параметрами:
