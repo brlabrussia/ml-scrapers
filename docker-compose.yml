@@ -6,24 +6,29 @@ services:
     image: brl/scrapy
     volumes:
       - .:/app/:cached
-    ports:
-      - 6800:6800
+    expose:
+      - 6800
     networks:
       - traefik_network
+      - inner_network
     labels:
       - traefik.enable=true
       - traefik.http.routers.scrapy_http.rule=Host("$VIRTUAL_HOST")
-      - traefik.http.routers.scrapy_http.middlewares=scrapy_auth
+      - traefik.http.routers.scrapy_http.middlewares=redirect_middleware
+      - traefik.http.routers.scrapy_https.rule=Host("$VIRTUAL_HOST")
+      - traefik.http.routers.scrapy_https.tls.certresolver=httpchallenge_0
+      - traefik.http.routers.scrapy_https.middlewares=scrapy_auth
       - traefik.http.middlewares.scrapy_auth.basicauth.usersfile=/etc/traefik/.htpasswd
     command: scrapyd
     restart: always
 
   splash:
     image: scrapinghub/splash:3.4.1
-    ports:
-      - 8050:8050
+    expose:
+      - 8050
     networks:
-      - traefik_network
+            #- traefik_network
+      - inner_network
     command: --max-timeout 15 --maxrss 500
     restart: always
     depends_on:
@@ -33,3 +38,5 @@ networks:
   traefik_network:
     external:
       name: traefik_network
+  inner_network:
+    driver: bridge
