@@ -2,7 +2,6 @@ dateparser==0.7.*
 fake-useragent==0.1.*
 furl==2.1.*
 requests==2.23.*
-scrapy-rotating-proxies==0.6.*
 scrapy-splash==0.7.*
 scrapy==1.8.*
 scrapyd==1.2.*
