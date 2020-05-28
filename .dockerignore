@@ -1,7 +1,3 @@
-**__pycache__/
-*.py[cod]
-*$py.class
-
 .git/
 .vscode/
 .mypy_cache/
@@ -10,7 +6,12 @@
 .gitignore
 [dD]ocker*
 
-dbs/
-items/
-logs/
-twistd.pid
+./app/.scrapy/
+./app/dbs/
+./app/items/
+./app/logs/
+./app/twistd.pid
+
+**__pycache__/
+*.py[cod]
+*$py.class
