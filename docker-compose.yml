@@ -4,17 +4,13 @@ services:
   scrapy:
     build: .
     image: brl/scrapy
-    volumes:
-      - .:/app/:cached
     expose:
       - 6800
     networks:
-      - traefik_network
       - inner_network
+      - traefik_network
     labels:
       - traefik.enable=true
-      - traefik.http.routers.scrapy_http.rule=Host("$VIRTUAL_HOST")
-      - traefik.http.routers.scrapy_http.middlewares=redirect_middleware
       - traefik.http.routers.scrapy_https.rule=Host("$VIRTUAL_HOST")
       - traefik.http.routers.scrapy_https.tls.certresolver=httpchallenge_0
       - traefik.http.routers.scrapy_https.middlewares=scrapy_auth
@@ -27,7 +23,6 @@ services:
     expose:
       - 8050
     networks:
-            #- traefik_network
       - inner_network
     command: --max-timeout 15 --maxrss 500
     restart: always
@@ -35,8 +30,8 @@ services:
       - scrapy
 
 networks:
+  inner_network:
+    driver: bridge
   traefik_network:
     external:
       name: traefik_network
-  inner_network:
-    driver: bridge
