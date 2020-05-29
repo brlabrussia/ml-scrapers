@@ -30,7 +30,7 @@ class NordVPNProxyMiddleware:
         request.meta['proxy'] = self.proxy
         request.headers['Proxy-Authorization'] = self.proxy_authorization
 
-    def get_proxy(self):
+    def get_proxy(self) -> str:
         filters = {
             'country_id': 208,  # Sweden
             'servers_technologies': [21],  # proxy_ssl
@@ -51,7 +51,7 @@ class NordVPNProxyMiddleware:
         ]
         return random.choice(hostnames)
 
-    def get_proxy_authorization(self):
+    def get_proxy_authorization(self) -> str:
         credentials = (os.getenv('NORDVPN_USERNAME'), os.getenv('NORDVPN_PASSWORD'))
         if not all(credentials):
             self.logger.error("Can't get credentials from `NORDVPN_USERNAME` and `NORDVPN_PASSWORD` env variables")
