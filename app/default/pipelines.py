@@ -15,6 +15,9 @@ class WebhookPipeline:
     If `spider.webhook_compat` is set, adapt schema before sending.
     If `spider.webhook_chunk_size` isn't set, it defaults to 1000,
     if `spider.webhook_url` isn't set, pipeline gets disabled.
+
+    TODO stats for posts sent
+    TODO switch to crawler settings instead of spider attrs
     """
 
     url: str
@@ -84,3 +87,7 @@ class WebhookPipeline:
             'title': post.get('content_title', ''),
             'username': post.get('author', 'account is deleted'),  # bookmakerratings legacy
         }
+
+
+class ImagesPipeline:
+    pass
