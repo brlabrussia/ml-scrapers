@@ -7,9 +7,7 @@
 [dD]ocker*
 
 ./app/.scrapy/
-./app/dbs/
-./app/items/
-./app/logs/
+./app/.scrapyd/
 ./app/twistd.pid
 
 **__pycache__/

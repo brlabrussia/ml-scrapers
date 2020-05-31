@@ -5,8 +5,9 @@ version: '3'
 
 services:
   scrapy:
-    volumes:
-      - ./app/:/home/user/app/:cached
+    # Works poorly because of root permissions
+    # volumes:
+    #   - ./app/:/home/user/app/:cached
     ports:
       - 6800:6800
     # command: /bin/sh -c 'while sleep 1000; do :; done'
