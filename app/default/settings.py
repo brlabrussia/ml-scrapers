@@ -1,10 +1,12 @@
 from glob import glob
 from http import HTTPStatus
 
+from dotenv import load_dotenv
 from fake_useragent import UserAgent
 
-BOT_NAME = 'default'
+load_dotenv()  # Simplify local development
 
+BOT_NAME = 'default'
 SPIDER_MODULES = [path.replace('/', '.') for path in glob('*/spiders')]
 NEWSPIDER_MODULE = None
 

@@ -1,6 +1,7 @@
 dateparser==0.7.*
 fake-useragent==0.1.*
 furl==2.1.*
+python-dotenv==0.13.*
 requests==2.23.*
 scrapy-splash==0.7.*
 scrapy==1.8.*
