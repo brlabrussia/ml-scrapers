@@ -3,13 +3,13 @@ from furl import furl
 from slugify import slugify
 
 
-class SlotcatalogCasinosSpider(scrapy.Spider):
-    name = 'slotcatalog_casinos'
+class SlotcatalogProvidersSpider(scrapy.Spider):
+    name = 'slotcatalog_providers'
     allowed_domains = ['slotcatalog.com']
 
     def start_requests(self):
         yield scrapy.Request(
-            'https://slotcatalog.com/en/Top-Online-Casinos',
+            'https://slotcatalog.com/en/Providers',
             self.parse_countries,
             meta={'dont_cache': True},
         )
@@ -21,22 +21,22 @@ class SlotcatalogCasinosSpider(scrapy.Spider):
             f.args['cISO'] = country
             yield scrapy.Request(
                 url=f.url,
-                callback=self.parse_casinos_list,
+                callback=self.parse_providers_list,
                 meta={'dont_cache': True},
             )
 
-    def parse_casinos_list(self, response):
-        casino_items = response.css('.providerCard')
-        for ci in casino_items:
-            casino_url = ci.css('.providerName::attr(href)').get()
-            casino_name = ci.css('.providerName::text').get()
-            if not casino_url or not casino_name:
+    def parse_providers_list(self, response):
+        provider_items = response.css('.providerCard')
+        for ci in provider_items:
+            provider_url = ci.css('.providerName::attr(href)').get()
+            provider_name = ci.css('.providerName::text').get()
+            if not provider_url or not provider_name:
                 continue
-            casino_url = furl(casino_url).pathstr
+            provider_url = furl(provider_url).pathstr
             yield scrapy.Request(
-                response.urljoin(casino_url),
-                self.parse_casino,
-                cb_kwargs={'casino_name': casino_name},
+                response.urljoin(provider_url),
+                self.parse_provider,
+                cb_kwargs={'provider_name': provider_name},
                 meta={'dont_cache': False},
             )
         next_page = response.css('.navpag-cont .active + li a::attr(p)').get()
@@ -45,23 +45,24 @@ class SlotcatalogCasinosSpider(scrapy.Spider):
             f.args['p'] = next_page
             yield response.request.replace(url=f.url)
 
-    def parse_casino(self, response, casino_name):
+    def parse_provider(self, response, provider_name):
         # TODO switch to item loader
         item = {
             'source': 'slotcatalog',
-            'type': 'casinos',
-            'name': casino_name,
+            'type': 'providers',
+            'name': provider_name,
             'url': response.request.url,
-            'countries': response.css('.CasinoNameLeftCountries[data-label=Countries] a::text').getall(),
-            'providers': response.css('.CasinoNameLeft[data-label="Provider Name"] a::attr(href)').getall(),
+            'countries': response.css('.sixNameLeftCountries[data-label=Country] a::text').getall(),
         }
-        attr_blocks = response.css('.detail-tab') or ()
+        attr_blocks = response.css('.provDetail') or ()
         for ab in attr_blocks:
-            attr_name = ab.css('.detail-tab-title::text').get()
+            attr_name = ab.css('.provDetailTitle::text').get()
             if not attr_name:
                 continue
             attr_name = slugify(attr_name, separator='_')
-            attr_value = ab.css('.detail-tab-field *::text').getall()
+            attr_value = ab.css('.provDetailField *::text').getall()
+            if attr_name == 'website':
+                attr_value = ab.css('.provDetailField a::attr(href)').getall()
             item[attr_name] = attr_value
         for key in item:
             if isinstance(item[key], list):
