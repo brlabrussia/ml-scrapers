@@ -1,5 +1,5 @@
+import os
 from glob import glob
-from http import HTTPStatus
 
 from dotenv import load_dotenv
 from fake_useragent import UserAgent
@@ -19,34 +19,14 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 USER_AGENT = UserAgent(cache=False, fallback=USER_AGENT).chrome
 
 CONCURRENT_REQUESTS = 1
-RANDOMIZE_DOWNLOAD_DELAY = True
 DOWNLOAD_DELAY = 0
 DOWNLOAD_TIMEOUT = 30
 DOWNLOAD_MAXSIZE = 20971520  # 20MB
-AUTOTHROTTLE_ENABLED = False
-AUTOTHROTTLE_START_DELAY = 5
-AUTOTHROTTLE_MAX_DELAY = 60
-AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
-AUTOTHROTTLE_DEBUG = False
-
-# HttpCacheMiddleware
-# https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#module-scrapy.downloadermiddlewares.httpcache
-HTTPCACHE_ENABLED = False
-HTTPCACHE_EXPIRATION_SECS = 0
-HTTPCACHE_DIR = 'httpcache'
-HTTPCACHE_IGNORE_HTTP_CODES = [hs.value for hs in HTTPStatus if hs.value != 200]
-HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.DbmCacheStorage'  # overridden below by Splash
 
 # NordVPNProxyMiddleware
-# Currently configured via `PROXY_PROVIDER = 'nordvpn'`
 NORDVPN_ENABLED = False
-
-# ImagesPipeline
-# Project uses custom version which is based on built-in one
-# https://docs.scrapy.org/en/latest/topics/media-pipeline.html#scrapy.pipelines.images.ImagesPipeline
-IMAGES_ENABLED = False
-IMAGES_STORE = '.scrapy/images'
-IMAGES_EXPIRES = 3
+NORDVPN_USERNAME = os.getenv('NORDVPN_USERNAME')
+NORDVPN_PASSWORD = os.getenv('NORDVPN_PASSWORD')
 
 # WebhookPipeline
 # Currently configured via spider attributes
@@ -54,6 +34,13 @@ WEBHOOK_ENABLED = False
 WEBHOOK_URL = None
 WEBHOOK_CHUNK_SIZE = 1000
 WEBHOOK_COMPAT = False
+
+# ImagesPipeline
+# Project uses custom version which is based on built-in one
+# https://docs.scrapy.org/en/latest/topics/media-pipeline.html#scrapy.pipelines.images.ImagesPipeline
+IMAGES_ENABLED = False
+IMAGES_STORE = '.scrapy/images'
+IMAGES_EXPIRES = 3
 
 SPIDER_MIDDLEWARES = {}
 
@@ -70,7 +57,7 @@ ITEM_PIPELINES = {
 EXTENSIONS = {}
 
 # Splash settings https://github.com/scrapy-plugins/scrapy-splash
-SPLASH_URL = 'http://splash:8050/'
+SPLASH_URL = os.getenv('SPLASH_URL')
 DOWNLOADER_MIDDLEWARES.update({
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
