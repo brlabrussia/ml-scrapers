@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import random
 
 import requests
@@ -9,28 +8,45 @@ from w3lib.http import basic_auth_header
 
 
 class NordVPNProxyMiddleware:
+    def __init__(self, creds):
+        self.logger = logging.getLogger(f'{__name__}.{self.__class__.__name__}')
+        self.proxy = self.get_proxy()
+        self.proxy_auth = basic_auth_header(*creds)
+        self.logger.debug(f'Using `{self.proxy}` as proxy')
+
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(crawler)
-
-    def __init__(self, crawler):
-        self.logger = logging.getLogger(f'{__name__}.{self.__class__.__name__}')
-        if not crawler.settings.get('PROXY_PROVIDER', '').lower() == 'nordvpn':
+        if not crawler.settings.getbool('NORDVPN_ENABLED'):
             raise NotConfigured
+
         if crawler.settings.getint('CONCURRENT_REQUESTS') != 1:
-            self.logger.error("Can't use NordVPN with `CONCURRENT_REQUESTS != 1`")
             raise CloseSpider('multiple_concurrent_requests')
-        self.proxy = self.get_proxy()
-        self.logger.debug(f'Using `{self.proxy}` as proxy')
-        self.proxy_authorization = self.get_proxy_authorization()
+
+        creds = (
+            crawler.settings.get('NORDVPN_USERNAME'),
+            crawler.settings.get('NORDVPN_PASSWORD'),
+        )
+        if not all(creds):
+            raise CloseSpider('credentials_not_set')
+
+        return cls(creds)
 
     def process_request(self, request, spider):
         if 'proxy' in request.meta:
             return
         request.meta['proxy'] = self.proxy
-        request.headers['Proxy-Authorization'] = self.proxy_authorization
+        request.headers['Proxy-Authorization'] = self.proxy_auth
 
     def get_proxy(self) -> str:
+        """
+        Get proxy for current session randomly chosen from list of NordVPN servers
+        currently online and supporting proxy_ssl.
+
+        We query multiple and only choose one for situations where this one
+        proxy can have temporary issues resulting in middleware not working.
+
+        TODO allow specifying prefered countries in project settings
+        """
         filters = {
             'country_id': 208,  # Sweden
             'servers_technologies': [21],  # proxy_ssl
@@ -50,10 +66,3 @@ class NordVPNProxyMiddleware:
             if server.get('hostname')
         ]
         return random.choice(hostnames)
-
-    def get_proxy_authorization(self) -> str:
-        credentials = (os.getenv('NORDVPN_USERNAME'), os.getenv('NORDVPN_PASSWORD'))
-        if not all(credentials):
-            self.logger.error("Can't get credentials from `NORDVPN_USERNAME` and `NORDVPN_PASSWORD` env variables")
-            raise CloseSpider('credentials_not_set')
-        return basic_auth_header(*credentials)
