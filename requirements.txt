@@ -30,6 +30,7 @@ pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via scrapy
 python-dateutil==2.8.1    # via dateparser
 python-dotenv==0.13.0     # via -r requirements.in
+python-slugify==4.0.0     # via -r requirements.in
 pytz==2019.3              # via dateparser, tzlocal
 queuelib==1.5.0           # via scrapy
 regex==2020.2.20          # via dateparser
@@ -39,6 +40,7 @@ scrapy==1.8.0             # via -r requirements.in, scrapyd
 scrapyd==1.2.1            # via -r requirements.in
 service-identity==18.1.0  # via scrapy
 six==1.14.0               # via automat, cryptography, furl, orderedmultidict, parsel, protego, pyopenssl, python-dateutil, scrapy, scrapyd, w3lib
+text-unidecode==1.3       # via python-slugify
 twisted==20.3.0           # via scrapy, scrapyd
 tzlocal==2.0.0            # via dateparser
 urllib3==1.25.8           # via requests
