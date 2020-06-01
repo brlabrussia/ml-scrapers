@@ -1,8 +1,9 @@
-dateparser==0.7.*
-fake-useragent==0.1.*
-furl==2.1.*
-python-dotenv==0.13.*
-requests==2.23.*
-scrapy-splash==0.7.*
-scrapy==1.8.*
 scrapyd==1.2.*
+scrapy==1.8.*
+scrapy-splash==0.7.*
+requests==2.23.*
+python-slugify==4.0.*
+python-dotenv==0.13.*
+furl==2.1.*
+fake-useragent==0.1.*
+dateparser==0.7.*
