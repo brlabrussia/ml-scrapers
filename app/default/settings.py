@@ -14,7 +14,6 @@ LOG_LEVEL = 'INFO'
 FEED_EXPORT_ENCODING = 'utf-8'
 TELNETCONSOLE_ENABLED = False
 
-COOKIES_ENABLED = False
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36'
 USER_AGENT = UserAgent(cache=False, fallback=USER_AGENT).chrome
 
