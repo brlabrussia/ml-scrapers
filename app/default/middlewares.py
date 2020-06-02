@@ -12,7 +12,6 @@ class NordVPNProxyMiddleware:
         self.logger = logging.getLogger(f'{__name__}.{self.__class__.__name__}')
         self.proxy = self.get_proxy()
         self.proxy_auth = basic_auth_header(*creds)
-        self.logger.debug(f'Using `{self.proxy}` as proxy')
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -30,6 +29,9 @@ class NordVPNProxyMiddleware:
             raise CloseSpider('credentials_not_set')
 
         return cls(creds)
+
+    def open_spider(self, spider):
+        self.logger.debug(f'Using `{self.proxy}` as proxy')
 
     def process_request(self, request, spider):
         if 'proxy' in request.meta:
