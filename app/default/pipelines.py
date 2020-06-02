@@ -3,7 +3,9 @@ from typing import Dict, List
 from urllib.parse import urlparse
 
 import requests
+from furl import furl
 from scrapy.exceptions import NotConfigured
+from scrapy.pipelines.images import ImagesPipeline as ImagesPipeline_
 
 
 class WebhookPipeline:
@@ -100,5 +102,12 @@ class WebhookPipeline:
         }
 
 
-class ImagesPipeline:
-    pass
+class ImagesPipeline(ImagesPipeline_):
+    @classmethod
+    def from_crawler(cls, crawler):
+        if not crawler.settings.getbool('IMAGES_ENABLED'):
+            raise NotConfigured
+
+    def file_path(self, request, response=None, info=None):
+        f = furl(request.url)
+        return f.host + f.pathstr
