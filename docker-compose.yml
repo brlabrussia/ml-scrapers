@@ -1,9 +1,8 @@
 version: '3'
 
 services:
-  scrapy:
+  app:
     build: .
-    image: brl/scrapy
     expose:
       - 6800
     networks:
@@ -28,8 +27,6 @@ services:
       - inner_network
     command: --max-timeout 15 --maxrss 500
     restart: always
-    depends_on:
-      - scrapy
 
 networks:
   inner_network:

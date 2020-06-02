@@ -1,11 +1,3 @@
-.git/
-.vscode/
-.mypy_cache/
-*venv*/
-.dockerignore
-.gitignore
-[dD]ocker*
-
 ./app/.scrapy/
 ./app/.scrapyd/
 ./app/twistd.pid
