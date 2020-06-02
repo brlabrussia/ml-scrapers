@@ -67,7 +67,8 @@ class WebhookPipeline:
     def send_items(self):
         response = self.client.post(self.endpoint, json=self.items)
         self.stats.inc_value('webhook/items_count', len(self.items))
-        self.stats.inc_value('webhook/response_count')
+        if response.ok:
+            self.stats.inc_value('webhook/response_count')
         self.stats.inc_value(f'webhook/response_status_count/{response.status_code}')
         self.items.clear()
 
