@@ -29,8 +29,8 @@ NORDVPN_PASSWORD = os.getenv('NORDVPN_PASSWORD')
 
 # WebhookPipeline
 # Currently configured via spider attributes
-WEBHOOK_ENABLED = False
-WEBHOOK_URL = None
+WEBHOOK_ENABLED = True
+WEBHOOK_ENDPOINT = None
 WEBHOOK_CHUNK_SIZE = 1000
 WEBHOOK_COMPAT = False
 
