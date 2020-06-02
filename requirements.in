@@ -4,6 +4,7 @@ scrapy-splash==0.7.*
 requests==2.23.*
 python-slugify==4.0.*
 python-dotenv==0.13.*
+pillow==7.1.*
 furl==2.1.*
 fake-useragent==0.1.*
 dateparser==0.7.*
