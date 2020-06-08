@@ -1,6 +1,5 @@
 import scrapy
 from furl import furl
-from slugify import slugify
 
 
 class SlotcatalogCasinosSpider(scrapy.Spider):
@@ -17,11 +16,9 @@ class SlotcatalogCasinosSpider(scrapy.Spider):
     def parse_countries(self, response):
         countries = response.css('select[name=cISO] option::attr(value)').getall()
         for country in countries:
-            f = furl(response.request.url)
-            f.args['cISO'] = country
             yield scrapy.Request(
-                url=f.url,
-                callback=self.parse_casinos_list,
+                furl(response.url).set({'cISO': country}).url,
+                self.parse_casinos_list,
                 meta={'dont_cache': True},
             )
 
@@ -32,9 +29,8 @@ class SlotcatalogCasinosSpider(scrapy.Spider):
             casino_name = ci.css('.providerName::text').get()
             if not casino_url or not casino_name:
                 continue
-            casino_url = furl(casino_url).pathstr
             yield scrapy.Request(
-                response.urljoin(casino_url),
+                furl(response.url).join(casino_url).set({'cISO': 'RU'}).url,
                 self.parse_casino,
                 cb_kwargs={'casino_name': casino_name},
                 meta={'dont_cache': False},
@@ -46,24 +42,23 @@ class SlotcatalogCasinosSpider(scrapy.Spider):
             yield response.request.replace(url=f.url)
 
     def parse_casino(self, response, casino_name):
-        # TODO switch to item loader
-        item = {
+        def extract_props(css_prop_blocks, css_prop_name, css_prop_value):
+            props = {}
+            prop_blocks = response.css(css_prop_blocks)
+            for pb in prop_blocks:
+                prop_name = pb.css(css_prop_name).get()
+                if not prop_name:
+                    continue
+                prop_value = pb.css(css_prop_value).getall()
+                props[prop_name.strip()] = ''.join(prop_value).strip()
+            return props
+        yield {
             'source': 'slotcatalog',
             'type': 'casinos',
             'name': casino_name,
-            'url': response.request.url,
-            'countries': response.css('.CasinoNameLeftCountries[data-label=Countries] a::text').getall(),
+            'url': furl(response.url).set({}).url,
+            'props_upper': extract_props('.casino_prop_item_pad', '.prop_name::text', '.prop_number::text'),
+            'props_lower': extract_props('.detail-tab', '.detail-tab-title::text', '.detail-tab-field *::text'),
+            'countries': response.css('.CasinoNameLeftCountries[data-label=Countries] a:last-child::text').getall(),
             'providers': response.css('.CasinoNameLeft[data-label="Provider Name"] a::attr(href)').getall(),
         }
-        attr_blocks = response.css('.detail-tab') or ()
-        for ab in attr_blocks:
-            attr_name = ab.css('.detail-tab-title::text').get()
-            if not attr_name:
-                continue
-            attr_name = slugify(attr_name, separator='_')
-            attr_value = ab.css('.detail-tab-field *::text').getall()
-            item[attr_name] = attr_value
-        for key in item:
-            if isinstance(item[key], list):
-                item[key] = ''.join(item[key]).strip()
-        yield item
