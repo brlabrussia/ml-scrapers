@@ -1,11 +1,24 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import Identity, MapCompose, TakeFirst
+from scrapy.loader.processors import Identity, MapCompose
+
+
+class TakeFirstOrNull:
+    def __call__(self, values):
+        for value in values:
+            if value is not None and value != '':
+                return value
+        else:
+            return None
 
 
 class Rating(scrapy.Item):
     url = scrapy.Field()
     subject = scrapy.Field()
+
+    # Дефолт для всех полей
+    all_min = scrapy.Field()
+    all_max = scrapy.Field()
 
     # РЕЙТИНГ ЭКСПЕРТОВ
     experts = scrapy.Field()
@@ -44,7 +57,7 @@ class Rating(scrapy.Item):
 class RatingLoader(ItemLoader):
     default_item_class = Rating
     default_input_processor = MapCompose(float)
-    default_output_processor = TakeFirst()
+    default_output_processor = TakeFirstOrNull()
 
     url_in = Identity()
-    subject_in = Identity()
+    subject_in = MapCompose(str.strip, Identity())
