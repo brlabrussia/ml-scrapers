@@ -1,8 +1,10 @@
-version: '3'
+version: '3.8'
 
 services:
   app:
     build: .
+    volumes:
+      - ./app/:/home/user/app/:cached
     expose:
       - 6800
     networks:
@@ -20,12 +22,12 @@ services:
     restart: always
 
   splash:
-    image: scrapinghub/splash:3.4.1
+    image: scrapinghub/splash:3.5.0
     expose:
       - 8050
     networks:
       - inner_network
-    command: --max-timeout 15 --maxrss 500
+    command: --max-timeout 15 --maxrss 750
     restart: always
 
 networks:
