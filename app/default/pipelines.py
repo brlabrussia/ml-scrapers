@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import requests
 from furl import furl
-from scrapy.exceptions import NotConfigured
+from scrapy.exceptions import DropItem, NotConfigured
 from scrapy.pipelines.images import ImagesPipeline as ImagesPipeline_
 
 
@@ -100,6 +100,44 @@ class WebhookPipeline:
             'title': post.get('content_title', ''),
             'username': post.get('author', 'account is deleted'),  # bookmakerratings legacy
         }
+
+
+class ScrapyMetaFieldPipeline:
+    """
+    To every item assign `scrapy_project` and `scrapy_spider` fields.
+    """
+    def process_item(self, item, spider):
+        item['scrapy_project'] = spider.settings.get('BOT_NAME')
+        item['scrapy_spider'] = spider.name
+        return item
+
+
+class SentimentSourceFieldPipeline:
+    """
+    To every item assign predefined `source` field, drop on failure.
+    """
+    def process_item(self, item, spider):
+        host_source_matches = {
+            'apple.com': 'Itunes.apple.com',
+            'apps.apple.com': 'Itunes.apple.com',
+            'bet.championat.com': 'Чемпионат',
+            'betonmobile.ru': 'Betonmobile',
+            'bookmaker-ratings.ru': 'Рейтинг Букмекеров',
+            'championat.com': 'Чемпионат',
+            'kushvsporte.ru': 'Kush v sporte',
+            'legalbet.ru': 'Legalbet',
+            'overbetting.ru': 'overbetting',
+            'sports.ru': 'Sports.ru',
+            'vprognoze.ru': 'vprognoze',
+            'vseprosport.ru': 'ВсеПроСпорт.ру',
+        }
+        host = urlparse(item.get('url')).netloc.replace('www.', '')
+        source = host_source_matches.get(host)
+        if source:
+            item['source'] = source
+            return item
+        else:
+            raise DropItem('source_not_found')
 
 
 class ImagesPipeline(ImagesPipeline_):

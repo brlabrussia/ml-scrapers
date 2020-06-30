@@ -13,6 +13,14 @@ class TakeFirstOrNull:
 
 
 class Rating(scrapy.Item):
+    # default.pipelines.ScrapyMetaFieldPipeline
+    scrapy_project = scrapy.Field()
+    scrapy_spider = scrapy.Field()
+
+    # default.pipelines.SentimentSourceFieldPipeline
+    source = scrapy.Field()
+
+    # Meta
     url = scrapy.Field()
     subject = scrapy.Field()
 
