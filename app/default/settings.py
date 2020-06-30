@@ -64,3 +64,4 @@ SPIDER_MIDDLEWARES.update({
 })
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
+SPLASH_LOG_400 = False
