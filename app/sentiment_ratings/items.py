@@ -25,8 +25,8 @@ class Rating(scrapy.Item):
     subject = scrapy.Field()
 
     # Дефолт для всех полей
-    all_min = scrapy.Field()
-    all_max = scrapy.Field()
+    min = scrapy.Field()
+    max = scrapy.Field()
 
     # РЕЙТИНГ ЭКСПЕРТОВ
     experts = scrapy.Field()
