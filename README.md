@@ -5,7 +5,7 @@
 ```shell
 cp .env.example .env
 docker-compose up -d
-source helpers.sh
+source helpers.sh  # импортируем шелл-хелперы для команд вроде sc
 sc sentiment_ru itunes  # sc имя-проекта имя-скрапера
 ```
 Посмотреть логи и собранные айтемы можно в:
@@ -28,13 +28,14 @@ curl https://scrapy.localhost/schedule.json \
     -d setting=WEBHOOK_CHUNK_SIZE=10
 ```
 
-Преобразовать curl-запрос во многие другие можно здесь: https://curl.trillworks.com/
+###### Преобразовать curl-запрос во многие другие можно здесь: https://curl.trillworks.com/
 
 ## API (Legacy и `sentiment_ru`)
 Вышеописанный пайплайн также поддерживает задания параметров через атрибуты скрапера:
 - `webhook_url` куда POST-запросом будет отправлен JSON с постами;
 - `webhook_chunk_size=1000` размер чанков с постами;
 - `webhook_compat=0` режим совместимости со старыми скраперами.
+
 Также скраперы `sentiment_ru` поддерживают:
 - `crawl_deep=0` каждый субъект парсится вглубь;
 - `crawl_depth` глубина парсинга, зависит от источника.
