@@ -9,11 +9,11 @@ source helpers.sh
 sc sentiment_ru itunes  # sc имя-проекта имя-скрапера
 ```
 Посмотреть логи и собранные айтемы можно в:
-директории `./app/.scrapyd/`;
-админке `https://scrapy.localhost/`.
+- директории `./app/.scrapyd/`;
+- админке https://scrapy.localhost/ (имя и пароль - те, что использовались при настройке Traefik).
 
 ## API
-Поддерживаются [эндпоинты scrapyd](https://scrapyd.readthedocs.io/en/stable/api.html "эндпоинты scrapyd"), причем через [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json") можно задавать/переопределять настройки проекта (`-d setting=настройка=значение`) и атрибуты скрапера (`-d аттрибут=значение`). В основном это актуально для настроек вебхука:
+Поддерживаются [listspiders.json](https://scrapyd.readthedocs.io/en/stable/api.html#listspiders-json "listspiders.json") и [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json"), через последний можно задавать/переопределять настройки проекта (`-d setting=настройка=значение`) и атрибуты скрапера (`-d аттрибут=значение`). В основном это актуально для настроек вебхука:
 - `WEBHOOK_ENABLED=True` вкл/выкл;
 - `WEBHOOK_ENDPOINT=None` куда POST-запросом будет отправлен JSON с постами;
 - `WEBHOOK_CHUNK_SIZE=1000` размер чанков с постами;
@@ -21,11 +21,14 @@ sc sentiment_ru itunes  # sc имя-проекта имя-скрапера
 
 ```shell
 curl https://scrapy.localhost/schedule.json \
+    -u user:pass \  # имя и пароль - те, что использовались при настройке Traefik
     -d project=sentiment_ratings \
     -d spider=kushvsporte \
     -d setting=WEBHOOK_ENDPOINT=https://webhook.site/1a44e5a5-bd3b-45a2-9ee3-be4bacf39072 \
     -d setting=WEBHOOK_CHUNK_SIZE=10
 ```
+
+Преобразовать curl-запрос во многие другие можно здесь: https://curl.trillworks.com/
 
 ## API (Legacy и `sentiment_ru`)
 Вышеописанный пайплайн также поддерживает задания параметров через атрибуты скрапера:
