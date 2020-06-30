@@ -6,18 +6,18 @@
 cp .env.example .env
 docker-compose up -d
 source helpers.sh  # импортируем шелл-хелперы для команд вроде sc
-sc sentiment_ru itunes  # sc имя-проекта имя-скрапера
+sc sentiment_ru itunes  # для проекта sentiment_ru запускаем скрапер itunes
 ```
 Посмотреть логи и собранные айтемы можно в:
 - директории `./app/.scrapyd/`;
 - админке https://scrapy.localhost/ (имя и пароль - те, что использовались при настройке Traefik).
 
 ## API
-Поддерживаются [listspiders.json](https://scrapyd.readthedocs.io/en/stable/api.html#listspiders-json "listspiders.json") и [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json"), через последний можно задавать/переопределять настройки проекта (`-d setting=настройка=значение`) и атрибуты скрапера (`-d аттрибут=значение`). В основном это актуально для настроек вебхука:
+###### API для v1: https://github.com/brlabrussia/ml-scrapers/blob/v1/README.md#api
+Поддерживаются [listspiders.json](https://scrapyd.readthedocs.io/en/stable/api.html#listspiders-json "listspiders.json") и [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json"), через последний можно задавать/переопределять настройки проекта (`-d setting=настройка=значение`) и атрибуты скрапера (`-d атрибут=значение`). В основном это актуально для настроек вебхука:
 - `WEBHOOK_ENABLED=True` вкл/выкл;
 - `WEBHOOK_ENDPOINT=None` куда POST-запросом будет отправлен JSON с постами;
-- `WEBHOOK_CHUNK_SIZE=1000` размер чанков с постами;
-- `WEBHOOK_COMPAT=False` режим совместимости со старыми скраперами `sentiment_ru`.
+- `WEBHOOK_CHUNK_SIZE=1000` размер чанков с постами.
 
 ```shell
 curl https://scrapy.localhost/schedule.json \
@@ -29,22 +29,3 @@ curl https://scrapy.localhost/schedule.json \
 ```
 
 ###### Преобразовать curl-запрос во многие другие можно здесь: https://curl.trillworks.com/
-
-## API (Legacy и `sentiment_ru`)
-Вышеописанный пайплайн также поддерживает задания параметров через атрибуты скрапера:
-- `webhook_url` куда POST-запросом будет отправлен JSON с постами;
-- `webhook_chunk_size=1000` размер чанков с постами;
-- `webhook_compat=0` режим совместимости со старыми скраперами.
-
-Также скраперы `sentiment_ru` поддерживают:
-- `crawl_deep=0` каждый субъект парсится вглубь;
-- `crawl_depth` глубина парсинга, зависит от источника.
-
-```shell
-curl http://localhost:6800/schedule.json \
-    -d project=sentiment_ru \
-    -d spider=kushvsporte \
-    -d crawl_deep=1 \
-    -d webhook_url=https://httpbin.org/post \
-    -d webhook_chunk_size=9000
-```
