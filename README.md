@@ -13,7 +13,6 @@ sc sentiment_ru itunes  # для проекта sentiment_ru запускаем 
 - админке https://scrapy.localhost/ (имя и пароль - те, что использовались при настройке Traefik).
 
 ## API
-###### API для v1: https://github.com/brlabrussia/ml-scrapers/blob/v1/README.md#api
 Поддерживаются [listspiders.json](https://scrapyd.readthedocs.io/en/stable/api.html#listspiders-json "listspiders.json") и [schedule.json](https://scrapyd.readthedocs.io/en/stable/api.html#schedule-json "schedule.json"), через последний можно задавать/переопределять настройки проекта (`-d setting=настройка=значение`) и атрибуты скрапера (`-d атрибут=значение`). В основном это актуально для настроек вебхука:
 - `WEBHOOK_ENABLED=True` вкл/выкл;
 - `WEBHOOK_ENDPOINT=None` куда POST-запросом будет отправлен JSON с постами;
@@ -21,6 +20,7 @@ sc sentiment_ru itunes  # для проекта sentiment_ru запускаем 
 
 ```shell
 curl https://scrapy.localhost/schedule.json \
+    -k \  # в dev среде могут быть проблемы с проверкой серта
     -u user:pass \  # имя и пароль - те, что использовались при настройке Traefik
     -d project=sentiment_ratings \
     -d spider=kushvsporte \
