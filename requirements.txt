@@ -13,11 +13,14 @@ constantly==15.1.0        # via twisted
 cryptography==2.8         # via pyopenssl, scrapy, service-identity
 cssselect==1.1.0          # via parsel, scrapy
 dateparser==0.7.4         # via -r requirements.in
+et-xmlfile==1.0.1         # via openpyxl
 furl==2.1.0               # via -r requirements.in
 hyperlink==19.0.0         # via twisted
 idna==2.9                 # via hyperlink, requests
 incremental==17.5.0       # via twisted
+jdcal==1.4.1              # via openpyxl
 lxml==4.5.0               # via parsel, scrapy
+openpyxl==3.0.4           # via -r requirements.in
 orderedmultidict==1.0.1   # via furl
 parsel==1.5.2             # via scrapy
 pillow==7.1.2             # via -r requirements.in
