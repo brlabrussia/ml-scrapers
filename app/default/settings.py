@@ -1,9 +1,5 @@
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 BOT_NAME = 'default'
 SPIDER_MODULES = None
 NEWSPIDER_MODULE = None
