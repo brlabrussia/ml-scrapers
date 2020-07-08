@@ -32,7 +32,6 @@ pydispatcher==2.0.5       # via scrapy
 pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via scrapy
 python-dateutil==2.8.1    # via dateparser
-python-dotenv==0.13.0     # via -r requirements.in
 pytz==2019.3              # via dateparser, tzlocal
 queuelib==1.5.0           # via scrapy
 regex==2020.2.20          # via dateparser
