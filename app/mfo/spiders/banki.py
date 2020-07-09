@@ -58,8 +58,14 @@ class BankiSpider(scrapy.Spider):
             'repayment_order': get_value_list_for_field('Порядок погашения'),
             'repayment_order_description': get_note_for_field('Порядок погашения'),
             'payment_methods': get_value_list_for_field('Способ оплаты'),
-            'head_name': get_value_for_field('Руководитель'),
-            'trademark': get_value_for_field('Торговая марка'),
-            'legal_entity': get_value_for_field('Юридическое лицо'),
-            'ogrn': get_value_for_field('ОГРН'),
+            'organization': {
+                'trademark': get_value_for_field('Торговая марка'),
+                'legal_entity': get_value_for_field('Юридическое лицо'),
+                'head_name': get_value_for_field('Руководитель'),
+                'address': get_value_for_field('Адрес'),
+                'ogrn': get_value_for_field('ОГРН'),
+                'reg_number': get_value_for_field('Рег. номер'),
+                'phone': get_value_for_field('Телефон'),
+                'website': get_value_for_field('Официальный сайт'),
+            },
         }
