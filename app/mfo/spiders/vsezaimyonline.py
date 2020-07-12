@@ -1,7 +1,4 @@
 import scrapy
-from scrapy.loader import ItemLoader
-
-from mfo.items import VsezaimyonlineItem
 
 
 class VsezaimyonlineSpider(scrapy.Spider):
@@ -17,18 +14,28 @@ class VsezaimyonlineSpider(scrapy.Spider):
             yield response.follow(link, self.parse_info)
 
     def parse_info(self, response):
-        documents = []
-        for document_block in response.css('.documents_tab a'):
-            documents.append({
-                'name': document_block.css('::text').get(),
-                'url': document_block.css('::attr(href)').get(),
-            })
-        il = ItemLoader(VsezaimyonlineItem(), response=response)
-        il.add_css('subject', '.zaym-name::text')
-        il.add_value('url', response.url)
-        il.add_xpath('ogrn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ОГРН")]/text()', re=r'\d{5,}')
-        il.add_xpath('inn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ИНН")]/text()', re=r'\d{5,}')
-        il.add_css('refusal_reasons', 'div[data-id="1"] li::text')
-        il.add_css('social_networks', 'div[data-id="2"] li a::attr(href)')
-        il.add_value('documents', documents)
-        yield il.load_item()
+        item = {
+            'subject': response.css('.zaym-name::text').get(),
+            'url': response.url,
+            'props': {},
+        }
+        prop_name_blocks = response.css('#single_content_wrap .left-block li')
+        for pnb in prop_name_blocks:
+            prop_name = pnb.css('::text').get()
+            prop_data_id = pnb.css('::attr(data-id)').get()
+            prop_value_block = response.css(f'#single_content_wrap .right-block div[data-id="{prop_data_id}"]')
+            prop_value = {
+                'list': [
+                    ''.join(list_item.css('*::text').getall())
+                    for list_item in prop_value_block.css('li')
+                ],
+                'links': [
+                    {
+                        'text': link.css('::text').get(),
+                        'href': link.css('::attr(href)').get(),
+                    }
+                    for link in prop_value_block.css('a')
+                ],
+            }
+            item['props'][prop_name] = prop_value
+        yield item
