@@ -6,8 +6,11 @@ class BankiSpider(scrapy.Spider):
     allowed_domains = ['banki.ru']
 
     def start_requests(self):
-        url = 'https://www.banki.ru/microloans/companies/'
-        yield scrapy.Request(url, callback=self.parse_subjects)
+        # url = 'https://www.banki.ru/microloans/companies/'
+        # yield scrapy.Request(url, callback=self.parse_subjects)
+        for i in range(1, 400):
+            url = f'https://www.banki.ru/microloans/products/{i}/'
+            yield scrapy.Request(url, callback=self.parse_product)
 
     def parse_subjects(self, response):
         css = '*[data-test=mfo-item-company]::attr(href)'
@@ -23,6 +26,8 @@ class BankiSpider(scrapy.Spider):
         item = {
             'subject': response.css('h1::text').get(),
             'url': response.url,
+            'logo': response.css('[data-test=mfo-logo]::attr(src)').get(),
+            'actualization': response.xpath('//*[has-class("text-note")][starts-with(normalize-space(text()), "Дата актуализации")]/text()').get(),
             'props': {},
         }
         prop_blocks = response.css('.definition-list__item')
