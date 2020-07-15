@@ -17,6 +17,7 @@ class VsezaimyonlineSpider(scrapy.Spider):
         item = {
             'subject': response.css('.zaym-name::text').get(),
             'url': response.url,
+            'logo': response.css('.logo-company::attr(src)').get(),
             'props': {},
         }
         prop_name_blocks = response.css('#single_content_wrap .left-block li')
