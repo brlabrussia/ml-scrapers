@@ -16,7 +16,7 @@ class CbrSpider(scrapy.Spider):
         workbook = openpyxl.load_workbook(io.BytesIO(response.body))
         for row in workbook.active.iter_rows(min_row=6, values_only=True):
             yield {
-                'reg_number': '-'.join(row[1:6]),
+                'reg_number': ''.join(row[1:6]),
                 'registry_date': row[6],
                 'mfo_type': row[8],
                 'ogrn': row[9],
