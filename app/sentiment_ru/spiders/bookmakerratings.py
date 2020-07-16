@@ -7,7 +7,7 @@ from sentiment_ru.items import ReviewLoader
 class BookmakerratingsSpider(scrapy.Spider):
     name = 'bookmakerratings'
     allowed_domains = ['bookmaker-ratings.ru']
-    custom_settings = {'CONCURRENT_REQUESTS': 4}
+    custom_settings = {'CONCURRENT_REQUESTS': 1}
     crawl_deep = False
 
     def start_requests(self):
@@ -23,7 +23,7 @@ class BookmakerratingsSpider(scrapy.Spider):
             yield scrapy.Request(
                 method='POST',
                 url='https://bookmaker-ratings.ru/wp-admin/admin-ajax.php',
-                body=f'action=feedbacks_items_page&page=1&postID={subject_id}',
+                body=f'action=feedbacks_items_page&page=1&post_id={subject_id}',
                 headers={'Content-Type': 'application/x-www-form-urlencoded'},
                 callback=self.parse_reviews,
                 cb_kwargs={
