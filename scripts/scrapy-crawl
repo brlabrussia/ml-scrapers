@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# If SCRAPY_PROJECT is set, use it as project instead of first argument
+if [[ -v SCRAPY_PROJECT ]]; then
+    project=$SCRAPY_PROJECT
+    spider=$1
+    argv=${@:2}
+else
+    project=$1
+    spider=$2
+    argv=${@:3}
+fi
+
+# Prepare the command which will be passed to the container
+service_command="SCRAPY_PROJECT=$project scrapy crawl $spider $argv"
+
+# Echo command before execution, parens are used to launch in subshell and avoid "set +x"
+( set -x ; docker-compose exec app sh -c "$service_command" )
