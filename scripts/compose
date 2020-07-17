@@ -1,0 +1,10 @@
+#!/bin/bash
+
+case $1 in
+    up)
+        user_uid=$(id -u) user_gid=$(id -g) docker-compose $@
+        ;;
+    *)
+        docker-compose $@
+        ;;
+esac
