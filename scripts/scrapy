@@ -5,4 +5,5 @@ if [ -z $SCRAPY_PROJECT ]; then
     exit 1
 fi
 
-docker-compose exec app sh -c "SCRAPY_PROJECT=$SCRAPY_PROJECT scrapy $@"
+service_command="SCRAPY_PROJECT=$SCRAPY_PROJECT scrapy $@"
+docker-compose exec app sh -c "$service_command"
