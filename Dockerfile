@@ -4,12 +4,12 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
-ARG USERNAME=user
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-RUN groupadd --gid $USER_GID $USERNAME
-RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
-COPY ./app/ /home/user/app/
-RUN chown -R $USER_UID:$USER_GID /home/user/app/
-WORKDIR /home/user/app/
+ARG username=user
+ARG user_uid
+ARG user_gid
+RUN groupadd --gid $user_gid $username
+RUN useradd -s /bin/bash --uid $user_uid --gid $user_gid -m $username
+COPY ./app/ /home/$username/app/
+RUN chown -R $user_uid:$user_gid /home/$username/app/
+WORKDIR /home/$username/app/
 USER user

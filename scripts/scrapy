@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -z $SCRAPY_PROJECT ]; then
+    echo 'SCRAPY_PROJECT is not set'
+    exit 1
+fi
+
+service_command="SCRAPY_PROJECT=$SCRAPY_PROJECT scrapy $@"
+docker-compose exec app sh -c "$service_command"

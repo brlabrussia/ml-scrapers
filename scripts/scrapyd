@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ -z $SCRAPY_PROJECT ]; then
+    echo 'SCRAPY_PROJECT is not set'
+    exit 1
+fi
+
+case $1 in
+    schedule|crawl)
+        service_command="curl localhost:6800/schedule.json -d project=$SCRAPY_PROJECT -d spider=${@:2}"
+        ;;
+    listspiders|list)
+        service_command="curl localhost:6800/listspiders.json?project=$SCRAPY_PROJECT"
+        ;;
+    *)
+        echo 'Command not implemented'
+        exit 1
+        ;;
+esac
+
+docker-compose exec app sh -c "$service_command"

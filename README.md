@@ -3,10 +3,11 @@
 
 ## Quick Start
 ```shell
-cp .env.example .env
-docker-compose up -d
-source helpers.sh  # импортируем шелл-хелперы для команд вроде sc
-sc sentiment_ru itunes  # для проекта sentiment_ru запускаем скрапер itunes
+cp .env.example .env  # копируем дефолтные переменные среды
+scripts/compose up -d --build  # хелпер для запуска сервиса с корректными пермишенами
+export SCRAPY_PROJECT=sentiment_ru  # задаем sentiment_ru в качестве проекта
+scripts/scrapyd list  # смотрим какие спайдеры доступны
+scripts/scrapyd crawl itunes  # запускаем спайдер itunes
 ```
 Посмотреть логи и собранные айтемы можно в:
 - директории `./app/.scrapyd/`;

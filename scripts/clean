@@ -1,0 +1,5 @@
+#!/bin/bash
+
+py3clean ./app/  # removes .pyc and .pyo files, debian-based only
+rm -f ./app/twistd.pid  # scrapyd crashes if twistd.pid already exist
+rm -rf ./app/.scrapy{,d}/   # avoid potential conflicts
