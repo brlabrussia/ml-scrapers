@@ -28,9 +28,11 @@ class ChampionatSpider(scrapy.Spider):
             elif '_bad' in classes:
                 return 0
 
+        subject_parts = response.css('.block-bookmaker-info__title *::text').getall()
+        subject = ''.join(subject_parts).strip()
         rl = RatingLoader(response=response)
         rl.add_value('url', response.url)
-        rl.add_css('subject', '.block-bookmaker-info__title::text')
+        rl.add_value('subject', subject)
         rl.add_value('min', 0)
         rl.add_value('max', 5)
         rl.add_css('experts', '.block-bookmaker-info__description .rating-star-list::attr(data-rating)')
