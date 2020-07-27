@@ -1,5 +1,7 @@
 import scrapy
 
+from mfodb.items import VsezaimyonlineLoader
+
 
 class VsezaimyonlineSpider(scrapy.Spider):
     name = 'vsezaimyonline'
@@ -14,29 +16,19 @@ class VsezaimyonlineSpider(scrapy.Spider):
             yield response.follow(link, self.parse_info)
 
     def parse_info(self, response):
-        item = {
-            'subject': response.css('.zaym-name::text').get(),
-            'url': response.url,
-            'logo': response.css('.logo-company::attr(src)').get(),
-            'props': {},
-        }
-        prop_name_blocks = response.css('#single_content_wrap .left-block li')
-        for pnb in prop_name_blocks:
-            prop_name = pnb.css('::text').get()
-            prop_data_id = pnb.css('::attr(data-id)').get()
-            prop_value_block = response.css(f'#single_content_wrap .right-block div[data-id="{prop_data_id}"]')
-            prop_value = {
-                'list': [
-                    ''.join(list_item.css('*::text').getall())
-                    for list_item in prop_value_block.css('li')
-                ],
-                'links': [
-                    {
-                        'text': link.css('::text').get(),
-                        'href': link.css('::attr(href)').get(),
-                    }
-                    for link in prop_value_block.css('a')
-                ],
-            }
-            item['props'][prop_name] = prop_value
-        yield item
+        documents = []
+        for document_block in response.css('.documents_tab a'):
+            documents.append({
+                'name': document_block.css('::text').get(),
+                'url': document_block.css('::attr(href)').get(),
+            })
+        vl = VsezaimyonlineLoader(response=response)
+        vl.add_value('url', response.url)
+        vl.add_css('name', '.zaym-name::text')
+        vl.add_css('logo', '.logo-company::attr(src)')
+        vl.add_xpath('ogrn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ОГРН")]/text()', re=r'\d{5,}')
+        vl.add_xpath('inn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ИНН")]/text()', re=r'\d{5,}')
+        vl.add_css('refusal_reasons', 'div[data-id="1"] li::text')
+        vl.add_css('social_networks', 'div[data-id="2"] li a::attr(href)')
+        vl.add_value('documents', documents)
+        yield vl.load_item()

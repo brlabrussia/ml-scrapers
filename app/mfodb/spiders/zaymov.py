@@ -1,5 +1,7 @@
 import scrapy
 
+from mfodb.items import ZaymovLoader
+
 
 class ZaymovSpider(scrapy.Spider):
     name = 'zaymov'
@@ -17,19 +19,14 @@ class ZaymovSpider(scrapy.Spider):
             yield response.follow(next_page, self.parse_subjects)
 
     def parse_info(self, response):
-        item = {
-            'subject': response.css('article h1::text').get(),
-            'url': response.url,
-            'logo': response.css('.mfologo img::attr(src)').get(),
-            'props': {},
-        }
-        prop_blocks = response.css('.fir')
-        for pb in prop_blocks:
-            prop_name = pb.css('.sec::text').get()
-            prop_value_block = pb.css('.the')
-            prop_value = {
-                'text': prop_value_block.css('::text').get(),
-                'data-link': prop_value_block.css('::attr(data-link)').get(),
-            }
-            item['props'][prop_name] = prop_value
-        yield item
+        xp = '//*[has-class("sec")][normalize-space(text())="{}"]/../*[has-class("the")]/text()'
+        zl = ZaymovLoader(response=response)
+        zl.add_value('url', response.url)
+        zl.add_css('name', 'article h1::text')
+        zl.add_css('logo', '.mfologo img::attr(src)')
+        zl.add_xpath('reg_number', xp.format('лицензия №'))
+        zl.add_xpath('ogrn', xp.format('ОГРН'))
+        zl.add_xpath('registry_date', xp.format('дата внесения в реестр'))
+        zl.add_xpath('address', xp.format('адрес'))
+        zl.add_xpath('website', xp.format('официальный сайт'))
+        yield zl.load_item()
