@@ -21,12 +21,12 @@ class ZaymovSpider(scrapy.Spider):
     def parse_info(self, response):
         xp = '//*[has-class("sec")][normalize-space(text())="{}"]/../*[has-class("the")]/text()'
         zl = ZaymovLoader(response=response)
-        zl.add_value('url', response.url)
-        zl.add_css('name', 'article h1::text')
+        zl.add_value('scraped_from', response.url)
+        zl.add_css('trademark', 'article h1::text')
         zl.add_css('logo', '.mfologo img::attr(src)')
-        zl.add_xpath('reg_number', xp.format('лицензия №'))
-        zl.add_xpath('ogrn', xp.format('ОГРН'))
-        zl.add_xpath('registry_date', xp.format('дата внесения в реестр'))
+        zl.add_xpath('cbrn', xp.format('лицензия №'), re=r'\d{13}$')
+        zl.add_xpath('ogrn', xp.format('ОГРН'), re=r'\d{13}$')
+        zl.add_xpath('cbr_created_at', xp.format('дата внесения в реестр'))
         zl.add_xpath('address', xp.format('адрес'))
         zl.add_xpath('website', xp.format('официальный сайт'))
         yield zl.load_item()
