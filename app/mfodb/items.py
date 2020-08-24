@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 import dateparser
 from scrapy.item import Field, Item
@@ -12,7 +13,7 @@ def normalize_space(text: str) -> str:
         return text
 
 
-def format_date(date):
+def format_date(date: str) -> Optional[str]:
     """
     Take any scraped date and format it to ISO, return `None` on failure.
     """
@@ -24,143 +25,149 @@ def format_date(date):
     return date
 
 
-class BankiItem(Item):
-    address = Field()
-    borrowers_age = Field()
-    borrowers_categories = Field()
-    borrowers_documents = Field()
-    borrowers_registration = Field()
-    dates_from = Field()
-    dates_to = Field()
-    first_loan_condition = Field()
-    head_name = Field()
-    issuance = Field()
-    loan_form = Field()
-    loan_form_description = Field()
-    loan_processing = Field()
-    loan_providing = Field()
-    loan_purpose = Field()
-    loan_time_terms = Field()
-    logo = Field()
-    max_money_value = Field()
-    name = Field()
-    ogrn = Field()
-    payment_methods = Field()
-    rate = Field()
-    reg_number = Field()
-    repayment_order = Field()
-    repayment_order_description = Field()
-    trademark = Field()
-    updated_at = Field()
-    url = Field()
-    website = Field()
+class Lender(Item):
+    scraped_from = Field()
+
+    trademark = Field(help_text='Торговая марка')
+    name_short = Field(help_text='Сокращенное наименование')
+    name_full = Field(help_text='Полное наименование')
+    logo = Field(help_text='Логотип')
+    documents = Field(help_text='Документы')
+
+    is_legal = Field(help_text='Легальная МФО (есть в реестре ЦБ)')
+    cbr_created_at = Field(help_text='Дата внесения в реестр ЦБ')
+    type = Field(help_text='Вид МФО')
+    cbrn = Field(help_text='Регномер в ЦБ')
+    ogrn = Field(help_text='ОГРН')
+    inn = Field(help_text='ИНН')
+
+    website = Field(help_text='Вебсайт')
+    email = Field(help_text='Электронная почта')
+    socials = Field(help_text='Соцсети')
+    address = Field(help_text='Адрес')
+    head_name = Field(help_text='Руководитель')
+
+    decision_speed = Field(help_text='Скорость рассмотрения заявки')
+    payment_speed = Field(help_text='Скорость выплаты')
+    amount_min = Field(help_text='Минимальная сумма займа')
+    amount_max = Field(help_text='Максимальная сумма займа')
+    overpayment_day = Field(help_text='Переплата за день')
+    overpayment_full = Field(help_text='Переплата за весь срок')
+    decline_reasons = Field(help_text='Причины отказа')
 
 
-class BankiLoader(ItemLoader):
-    default_item_class = BankiItem
+class Loan(Item):
+    # * О займе
+    # https://www.banki.ru/microloans/products/2/
+    name = Field(help_text='Название займа')
+    banki_url = Field(help_text='Ссылка на Банки.ру')
+    banki_updated_at = Field(help_text='Дата актуализации на Банки.ру')
+    # ** Условия и ставки
+    purposes = Field(help_text='Цель займа')
+    amount_min = Field(help_text='Минимальная сумма займа')
+    amount_max = Field(help_text='Максимальная сумма займа')
+    amount_note = Field(help_text='Допинфа по сумме займа')
+    rate = Field(help_text='Ставка')
+    period_min = Field(help_text='Минимальный срок займа')
+    period_max = Field(help_text='Максимальный срок займа')
+    period_note = Field(help_text='Допинфа по срокам')
+    collateral = Field(help_text='Обеспечение')
+    # ** Требования и документы
+    borrower_categories = Field(help_text='Категории заемщиков')
+    borrower_age = Field(help_text='Возраст заемщика')
+    borrower_registration = Field(help_text='Регистрация заемщика')
+    borrower_documents = Field(help_text='Документы заемщика')
+    # ** Выдача
+    application_process = Field(help_text='Оформление займа')
+    payment_speed = Field(help_text='Срок выдачи')
+    payment_forms = Field(help_text='Форма выдачи')
+    payment_forms_note = Field(help_text='Допинфа по форме выдачи')
+    # ** Погашение
+    repayment_process = Field(help_text='Порядок погашения')
+    repayment_process_note = Field(help_text='Допинфа по порядку погашения')
+    repayment_forms = Field(help_text='Способ оплаты')
+
+    # * Об организации
+    lender_logo = Field(help_text='Логотип организации')
+    lender_trademark = Field(help_text='Торговая марка')
+    lender_address = Field(help_text='Адрес')
+    lender_head_name = Field(help_text='Руководитель')
+    lender_cbrn = Field(help_text='Регномер в ЦБ')
+    lender_ogrn = Field(help_text='ОГРН')
+
+
+class BasicLoader(ItemLoader):
+    default_item_class = Lender
     default_input_processor = MapCompose(normalize_space)
     default_output_processor = TakeFirst()
 
-    logo_in = MapCompose(
+    scraped_from_out = Identity()
+    cbr_created_at_in = MapCompose(
         normalize_space,
-        lambda x: ('http:' + x) if x.startswith('//') else x,
+        format_date,
     )
-    updated_at_in = MapCompose(format_date)
-    loan_purpose_out = Identity()
-    max_money_value_in = MapCompose(
-        lambda x: x.replace(' ', ''),
-        int,
-    )
-    # rate_in = MapCompose(
-    #     lambda x: x.replace(',', '.'),
-    #     float,
-    # )
-    dates_from_in = MapCompose(int)
-    dates_to_in = MapCompose(int)
-    loan_providing_out = Identity()
-    borrowers_categories_out = Identity()
-    borrowers_registration_out = Identity()
-    borrowers_documents_out = Identity()
-    loan_processing_out = Identity()
-    loan_form_out = Identity()
-    repayment_order_out = Identity()
-    payment_methods_out = Identity()
-    address_in = MapCompose(
+
+
+class CbrLoader(BasicLoader):
+    website_in = MapCompose(
+        str.lower,
         normalize_space,
-        lambda x: re.sub(r'<.*?>', '', x),
+        lambda x: x.replace(', ', ';'),
+        lambda x: x.split(';')[0],
+        lambda x: x.split(' ')[0],
+        lambda x: x if x.startswith('http') else 'http://' + x,
     )
-    ogrn_in = MapCompose(int)
-    reg_number_in = MapCompose(int)
+    email_in = MapCompose(
+        str.lower,
+        normalize_space,
+        lambda x: x.replace(', ', ';'),
+        lambda x: x.split(';')[0],
+        lambda x: x.split(' ')[0],
+    )
 
 
-class CbrItem(Item):
-    address = Field()
-    email = Field()
-    full_name = Field()
-    inn = Field()
-    mfo_type = Field()
-    name = Field()
-    ogrn = Field()
-    reg_number = Field()
-    registry_date = Field()
-    url = Field()
+class ZaymovLoader(BasicLoader):
+    pass
 
 
-class CbrLoader(ItemLoader):
-    default_item_class = CbrItem
-    default_input_processor = MapCompose(normalize_space)
-    default_output_processor = TakeFirst()
-
-    reg_number_in = MapCompose(int)
-    registry_date_in = MapCompose(format_date)
-    ogrn_in = MapCompose(int)
-    inn_in = MapCompose(int)
-
-
-class VsezaimyonlineItem(Item):
-    documents = Field()
-    inn = Field()
-    logo = Field()
-    name = Field()
-    ogrn = Field()
-    refusal_reasons = Field()
-    social_networks = Field()
-    url = Field()
-
-
-class VsezaimyonlineLoader(ItemLoader):
-    default_item_class = VsezaimyonlineItem
-    default_input_processor = MapCompose(normalize_space)
-    default_output_processor = TakeFirst()
-
+class VsezaimyonlineLoader(BasicLoader):
     logo_in = MapCompose(
         normalize_space,
         lambda x: ('https://vsezaimyonline.ru' + x) if x.startswith('/') else x,
     )
-    ogrn_in = MapCompose(int)
-    inn_in = MapCompose(int)
-    refusal_reasons_out = Identity()
-    social_networks_out = Identity()
+    decline_reasons_out = Identity()
+    socials_in = MapCompose(
+        lambda x: x if x.startswith('http') else None,
+    )
+    socials_out = Identity()
     documents_in = Identity()
     documents_out = Identity()
 
 
-class ZaymovItem(Item):
-    address = Field()
-    logo = Field()
-    name = Field()
-    ogrn = Field()
-    reg_number = Field()
-    registry_date = Field()
-    url = Field()
-    website = Field()
+class BankiLoader(BasicLoader):
+    default_item_class = Loan
 
+    banki_updated_at_in = MapCompose(format_date)
+    purposes_out = Identity()
+    amount_min_in = amount_max_in = MapCompose(
+        lambda x: x.replace(' ', ''),
+        int,
+    )
+    period_min_in = period_max_in = MapCompose(int)
+    collateral_out = Identity()
+    borrower_categories_out = Identity()
+    borrower_registration_out = Identity()
+    borrower_documents_out = Identity()
+    application_process_out = Identity()
+    payment_forms_out = Identity()
+    repayment_process_out = Identity()
+    repayment_forms_out = Identity()
 
-class ZaymovLoader(ItemLoader):
-    default_item_class = ZaymovItem
-    default_input_processor = MapCompose(normalize_space)
-    default_output_processor = TakeFirst()
-
-    reg_number_in = MapCompose(int)
-    ogrn_in = MapCompose(int)
-    registry_date_in = MapCompose(format_date)
+    lender_logo_in = MapCompose(
+        normalize_space,
+        lambda x: ('http:' + x) if x.startswith('//') else x,
+    )
+    lender_address_in = MapCompose(
+        normalize_space,
+        lambda x: re.sub(r'<.*?>', '', x),
+    )
