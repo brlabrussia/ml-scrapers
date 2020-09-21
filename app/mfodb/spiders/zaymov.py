@@ -23,7 +23,7 @@ class ZaymovSpider(scrapy.Spider):
         zl = ZaymovLoader(response=response)
         zl.add_value('scraped_from', response.url)
         zl.add_css('trademark', 'article h1::text')
-        zl.add_css('logo', '.mfologo img::attr(src)')
+        zl.add_css('logo_origin_url', '.mfologo img::attr(src)')
         zl.add_xpath('cbrn', xp.format('лицензия №'), re=r'\d{13}$')
         zl.add_xpath('ogrn', xp.format('ОГРН'), re=r'\d{13}$')
         zl.add_xpath('cbr_created_at', xp.format('дата внесения в реестр'))

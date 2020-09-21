@@ -27,7 +27,7 @@ class VsezaimyonlineSpider(scrapy.Spider):
         vl = VsezaimyonlineLoader(response=response)
         vl.add_value('scraped_from', response.url)
         vl.add_css('trademark', '.zaym-name::text')
-        vl.add_css('logo', '.logo-company::attr(src)')
+        vl.add_css('logo_origin_url', '.logo-company::attr(src)')
         vl.add_xpath('ogrn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ОГРН")]/text()', re=r'\d{13}')
         vl.add_xpath('inn', '//div[has-class("vab")]//li[starts-with(normalize-space(text()), "ИНН")]/text()', re=r'\d{10}')
         decline_reasons_id = response.xpath('//*[@id="single_content_wrap"]//li[normalize-space(text())="Причины отказа"]/@data-id').get()

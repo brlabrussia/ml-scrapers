@@ -1,10 +1,11 @@
 import re
 from typing import Optional
+from urllib.parse import unquote
 
 import dateparser
 from scrapy.item import Field, Item
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import Identity, MapCompose, TakeFirst
+from scrapy.loader.processors import Compose, Identity, MapCompose, TakeFirst
 
 
 def normalize_space(text: str) -> str:
@@ -31,7 +32,7 @@ class Lender(Item):
     trademark = Field(help_text='Торговая марка')
     name_short = Field(help_text='Сокращенное наименование')
     name_full = Field(help_text='Полное наименование')
-    logo = Field(help_text='Логотип')
+    logo_origin_url = Field(help_text='Логотип')
     documents = Field(help_text='Документы')
 
     is_legal = Field(help_text='Легальная МФО (есть в реестре ЦБ)')
@@ -67,7 +68,9 @@ class Loan(Item):
     amount_min = Field(help_text='Минимальная сумма займа')
     amount_max = Field(help_text='Максимальная сумма займа')
     amount_note = Field(help_text='Допинфа по сумме займа')
-    rate = Field(help_text='Ставка')
+    rate_min = Field(help_text='Минимальная ставка в день')
+    rate_max = Field(help_text='Максимальная ставка в день')
+    rate_note = Field(help_text='Допинфа по ставке')
     period_min = Field(help_text='Минимальный срок займа')
     period_max = Field(help_text='Максимальный срок займа')
     period_note = Field(help_text='Допинфа по срокам')
@@ -131,15 +134,16 @@ class ZaymovLoader(BasicLoader):
 
 
 class VsezaimyonlineLoader(BasicLoader):
-    logo_in = MapCompose(
+    logo_origin_url_in = MapCompose(
         normalize_space,
         lambda x: ('https://vsezaimyonline.ru' + x) if x.startswith('/') else x,
     )
     decline_reasons_out = Identity()
     socials_in = MapCompose(
+        unquote,
         lambda x: x if x.startswith('http') else None,
     )
-    socials_out = Identity()
+    socials_out = Compose(set)
     documents_in = Identity()
     documents_out = Identity()
 
@@ -150,8 +154,16 @@ class BankiLoader(BasicLoader):
     banki_updated_at_in = MapCompose(format_date)
     purposes_out = Identity()
     amount_min_in = amount_max_in = MapCompose(
+        str.lower,
+        normalize_space,
         lambda x: x.replace(' ', ''),
         int,
+    )
+    rate_min_in = rate_max_in = MapCompose(
+        str.lower,
+        normalize_space,
+        lambda x: x.replace(',', '.'),
+        float,
     )
     period_min_in = period_max_in = MapCompose(int)
     collateral_out = Identity()

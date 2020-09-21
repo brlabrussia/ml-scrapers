@@ -38,14 +38,20 @@ class BankiSpider(scrapy.Spider):
         # * О займе
         # ** Условия и ставки
         bl.add_xpath('purposes', xp.format('Цель займа', as_list))
-        bl.add_xpath('amount_min', xp.format('Сумма займа', as_text), re=r'от ([\d ]+)')
-        bl.add_xpath('amount_max', xp.format('Сумма займа', as_text), re=r'до ([\d ]+)')
+        bl.add_xpath('amount_min', xp.format('Сумма займа', as_text), re=r'^\s*от\s+([\d ]+)')  # either 'от 300 000 до 3 000 000 рублей'
+        bl.add_xpath('amount_min', xp.format('Сумма займа', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d ]+)')  # or '300 000 рублей'
+        bl.add_xpath('amount_max', xp.format('Сумма займа', as_text), re=r'\sдо\s+([\d ]+)')  # either 'от 300 000 до 3 000 000 рублей'
+        bl.add_xpath('amount_max', xp.format('Сумма займа', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d ]+)')  # or '300 000 рублей'
         bl.add_xpath('amount_note', xp.format('Сумма займа', as_note))
-        bl.add_xpath('rate', xp.format('Ставка', as_text))  # re=r'([\d\,]+)'
-        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'от (\d+)')  # either 'от 1 до 365 дней'
-        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'^(\d+) дней')  # or '7 дней'
-        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'до (\d+)')  # either 'от 1 до 365 дней'
-        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'^(\d+) дней')  # or '7 дней'
+        bl.add_xpath('rate_min', xp.format('Ставка', as_text), re=r'^\s*от\s+([\d\,]+)%?')  # either 'от 0,08 до 0,24% в день'
+        bl.add_xpath('rate_min', xp.format('Ставка', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d\,]+)%?\s+в\s+день')  # or '0,14% в день'
+        bl.add_xpath('rate_max', xp.format('Ставка', as_text), re=r'\sдо\s+([\d\,]+)%?')  # either 'от 0,08 до 0,24% в день'
+        bl.add_xpath('rate_max', xp.format('Ставка', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d\,]+)%?\s+в\s+день')  # or '0,14% в день'
+        bl.add_xpath('rate_note', xp.format('Ставка', as_note))
+        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'^\s*от\s+(\d+)')  # either 'от 1 до 365 дней'
+        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'^\s*(\d+)\s+дней')  # or '7 дней'
+        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'\sдо\s+(\d+)')  # either 'от 1 до 365 дней'
+        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'^\s*(\d+)\s+дней')  # or '7 дней'
         bl.add_xpath('period_note', xp.format('Срок', as_note))
         bl.add_xpath('collateral', xp.format('Обеспечение', as_list))
         # ** Требования и документы
