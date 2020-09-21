@@ -32,68 +32,48 @@ class BankiSpider(scrapy.Spider):
         as_note = '/*[has-class("text-note")]/p/text()'
 
         bl = BankiLoader(response=response)
-        bl.add_value('url', response.url)
         bl.add_css('name', 'h1::text')
-        bl.add_css('logo', '[data-test=mfo-logo]::attr(src)')
-        bl.add_xpath('updated_at', '//*[has-class("text-note")][starts-with(normalize-space(text()), "Дата актуализации")]/text()', re=r'\d{2}\.\d{2}\.\d{4} \d+:\d{2}')
+        bl.add_value('banki_url', response.url)
+        bl.add_xpath('banki_updated_at', '//*[has-class("text-note")][starts-with(normalize-space(text()), "Дата актуализации")]/text()', re=r'\d{2}\.\d{2}\.\d{4} \d+:\d{2}')
         # * О займе
         # ** Условия и ставки
-        bl.add_xpath('loan_purpose', xp.format('Цель займа', as_list))
-        bl.add_xpath('max_money_value', xp.format('Сумма займа', as_text), re=r'до ([\d ]+)')
-        bl.add_xpath('first_loan_condition', xp.format('Сумма займа', as_note))
-        bl.add_xpath('rate', xp.format('Ставка', as_text))  # re=r'([\d\,]+)'
-        bl.add_xpath('dates_from', xp.format('Срок', as_text), re=r'от (\d+)')  # either 'от 1 до 365 дней'
-        bl.add_xpath('dates_from', xp.format('Срок', as_text), re=r'^(\d+) дней')  # or '7 дней'
-        bl.add_xpath('dates_to', xp.format('Срок', as_text), re=r'до (\d+)')  # either 'от 1 до 365 дней'
-        bl.add_xpath('dates_to', xp.format('Срок', as_text), re=r'^(\d+) дней')  # or '7 дней'
-        bl.add_xpath('loan_time_terms', xp.format('Срок', as_note))
-        bl.add_xpath('loan_providing', xp.format('Обеспечение', as_list))
+        bl.add_xpath('purposes', xp.format('Цель займа', as_list))
+        bl.add_xpath('amount_min', xp.format('Сумма займа', as_text), re=r'^\s*от\s+([\d ]+)')  # either 'от 300 000 до 3 000 000 рублей'
+        bl.add_xpath('amount_min', xp.format('Сумма займа', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d ]+)')  # or '300 000 рублей'
+        bl.add_xpath('amount_max', xp.format('Сумма займа', as_text), re=r'\sдо\s+([\d ]+)')  # either 'от 300 000 до 3 000 000 рублей'
+        bl.add_xpath('amount_max', xp.format('Сумма займа', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d ]+)')  # or '300 000 рублей'
+        bl.add_xpath('amount_note', xp.format('Сумма займа', as_note))
+        bl.add_xpath('rate_min', xp.format('Ставка', as_text), re=r'^\s*от\s+([\d\,]+)%?')  # either 'от 0,08 до 0,24% в день'
+        bl.add_xpath('rate_min', xp.format('Ставка', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d\,]+)%?\s+в\s+день')  # or '0,14% в день'
+        bl.add_xpath('rate_max', xp.format('Ставка', as_text), re=r'\sдо\s+([\d\,]+)%?')  # either 'от 0,08 до 0,24% в день'
+        bl.add_xpath('rate_max', xp.format('Ставка', as_text), re=r'^\s*((до|от)\s+)?(?P<extract>[\d\,]+)%?\s+в\s+день')  # or '0,14% в день'
+        bl.add_xpath('rate_note', xp.format('Ставка', as_note))
+        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'^\s*от\s+(\d+)')  # either 'от 1 до 365 дней'
+        bl.add_xpath('period_min', xp.format('Срок', as_text), re=r'^\s*(\d+)\s+дней')  # or '7 дней'
+        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'\sдо\s+(\d+)')  # either 'от 1 до 365 дней'
+        bl.add_xpath('period_max', xp.format('Срок', as_text), re=r'^\s*(\d+)\s+дней')  # or '7 дней'
+        bl.add_xpath('period_note', xp.format('Срок', as_note))
+        bl.add_xpath('collateral', xp.format('Обеспечение', as_list))
         # ** Требования и документы
-        bl.add_xpath('borrowers_categories', xp.format('Категория заемщиков', as_list))
-        bl.add_xpath('borrowers_age', xp.format('Возраст заемщика', as_text))
-        bl.add_xpath('borrowers_registration', xp.format('Регистрация', as_list))
-        bl.add_xpath('borrowers_documents', xp.format('Документы', as_list))
+        bl.add_xpath('borrower_categories', xp.format('Категория заемщиков', as_list))
+        bl.add_xpath('borrower_age', xp.format('Возраст заемщика', as_text))
+        bl.add_xpath('borrower_registration', xp.format('Регистрация', as_list))
+        bl.add_xpath('borrower_documents', xp.format('Документы', as_list))
         # ** Выдача
-        bl.add_xpath('issuance', xp.format('Срок выдачи', as_text))
-        bl.add_xpath('loan_processing', xp.format('Оформление займа', as_list))
-        bl.add_xpath('loan_form', xp.format('Форма выдачи', as_list))
-        bl.add_xpath('loan_form_description', xp.format('Форма выдачи', as_note))
+        bl.add_xpath('application_process', xp.format('Оформление займа', as_list))
+        bl.add_xpath('payment_speed', xp.format('Срок выдачи', as_text))
+        bl.add_xpath('payment_forms', xp.format('Форма выдачи', as_list))
+        bl.add_xpath('payment_forms_note', xp.format('Форма выдачи', as_note))
         # ** Погашение
-        bl.add_xpath('repayment_order', xp.format('Порядок погашения', as_list))
-        bl.add_xpath('repayment_order_description', xp.format('Порядок погашения', as_note))
-        bl.add_xpath('payment_methods', xp.format('Способ оплаты', as_list))
+        bl.add_xpath('repayment_process', xp.format('Порядок погашения', as_list))
+        bl.add_xpath('repayment_process_note', xp.format('Порядок погашения', as_note))
+        bl.add_xpath('repayment_forms', xp.format('Способ оплаты', as_list))
         # * Об организации
-        bl.add_xpath('trademark', xp.format('Торговая марка', as_text))
-        bl.add_xpath('head_name', xp.format('Руководитель', as_text))
-        bl.add_xpath('address', xp.format('Адрес', as_text))
-        bl.add_xpath('ogrn', xp.format('ОГРН', as_text), re=r'\d{5,}')
-        bl.add_xpath('reg_number', xp.format('Рег. номер', as_text), re=r'\d{5,}')
-        bl.add_xpath('website', xp.format('Официальный сайт', '/a/text()'))
-        yield bl.load_item()
+        bl.add_css('lender_logo', '[data-test=mfo-logo]::attr(src)')
+        bl.add_xpath('lender_trademark', xp.format('Торговая марка', as_text))
+        bl.add_xpath('lender_address', xp.format('Адрес', as_text))
+        bl.add_xpath('lender_head_name', xp.format('Руководитель', as_text))
+        bl.add_xpath('lender_cbrn', xp.format('Рег. номер', as_text), re=r'\d{13}$')
+        bl.add_xpath('lender_ogrn', xp.format('ОГРН', as_text), re=r'\d{13}$')
 
-    def parse_product_old(self, response):
-        item = {
-            'subject': response.css('h1::text').get(),
-            'url': response.url,
-            'logo': response.css('[data-test=mfo-logo]::attr(src)').get(),
-            'actualization': response.xpath('//*[has-class("text-note")][starts-with(normalize-space(text()), "Дата актуализации")]/text()').get(),
-            'props': {},
-        }
-        prop_blocks = response.css('.definition-list__item')
-        for pb in prop_blocks:
-            prop_name = pb.css('.definition-list__key::text').get()
-            prop_value_block = pb.css('.definition-list__value')
-            prop_value = {
-                'text': prop_value_block.css('::text').get(),
-                'note': prop_value_block.css('.text-note p::text').get(),
-                'list': prop_value_block.css('li::text').getall(),
-                'links': [
-                    {
-                        'text': link.css('::text').get(),
-                        'href': link.css('::attr(href)').get(),
-                    }
-                    for link in prop_value_block.css('a')
-                ],
-            }
-            item['props'][prop_name] = prop_value
-        yield item
+        yield bl.load_item()
