@@ -19,15 +19,18 @@ class UfcSpider(DefaultSpider):
         # upper body
         row_loaders = []
         tdl = TableDataLoader(selector=table_sel)
+        tdl.base_url = response.url
         tdl.add_xpath('value', './/*[@class="info"]/h6/node()')
         tdl.add_xpath('value', './/*[@class="info"]/h4/span/node()')
         tdl.add_value('value', '')
         row_loaders.append(tdl)
         tdl = TableDataLoader(selector=table_sel)
+        tdl.base_url = response.url
         tdl.add_xpath('value', './/*[@class="info"]/h5/node()')
         tdl.add_value('value', '')
         row_loaders.append(tdl)
         tdl = TableDataLoader(selector=table_sel)
+        tdl.base_url = response.url
         tdl.add_value('value', '')
         row_loaders.append(tdl)
         tl.add_value('body', [row_loaders])
@@ -37,6 +40,7 @@ class UfcSpider(DefaultSpider):
             row_loaders = []
             for data_sel in row_sel.css('td'):
                 tdl = TableDataLoader(selector=data_sel)
+                tdl.base_url = response.url
                 tdl.add_xpath('value', './node()')
                 tdl.add_value('value', '')
                 tdl.add_xpath('colspan', './@colspan')

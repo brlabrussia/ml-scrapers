@@ -1,30 +1,28 @@
-import scrapy
-
 from tables.items import TableDataLoader, TableLoader
 from tables.spiders.default import DefaultSpider
 
 
-class FibaSpider(DefaultSpider):
-    name = 'fiba'
-    allowed_domains = ['fiba.basketball']
-    start_urls = ['https://www.fiba.basketball/rankingmen']
-
-    def start_requests(self):
-        url = self.start_urls[0]
-        if 'https://' in url:
-            url = url.replace('https://', 'https://webcache.googleusercontent.com/search?q=cache:')
-        yield scrapy.Request(url)
+class SportSpider(DefaultSpider):
+    name = 'sport'
+    allowed_domains = ['sport.ru', 'google.com']
+    start_urls = ['https://www.sport.ru/tennis/wta/rating-gonka/']
 
     def parse(self, response):
+        link = response.css('.tag-page-content iframe::attr(src)').get()
+        link = link.replace('/pubhtml', '/pubhtml/sheet')
+        yield response.follow(link, self.parse_)
+
+    def parse_(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_css('title', 'li#fiba h5::text')
-        table_sel = response.css('li#fiba .fiba_ranking_table')
+        table_sel = response.css('table')
 
         # head
-        for row_sel in table_sel.css('thead tr'):
+        for index, row_sel in enumerate(table_sel.css('tr')):
+            if 'Место' not in row_sel.get():
+                continue
             row_loaders = []
-            for data_sel in row_sel.css('th'):
+            for data_sel in row_sel.css('td'):
                 tdl = TableDataLoader(selector=data_sel)
                 tdl.base_url = response.url
                 tdl.add_xpath('value', './node()')
@@ -33,9 +31,10 @@ class FibaSpider(DefaultSpider):
                 tdl.add_xpath('rowspan', './@rowspan')
                 row_loaders.append(tdl)
             tl.add_value('head', [row_loaders])
+            break
 
         # body
-        for row_sel in table_sel.css('tbody tr'):
+        for row_sel in table_sel.css('tr')[index+1:]:
             row_loaders = []
             for data_sel in row_sel.css('td'):
                 tdl = TableDataLoader(selector=data_sel)

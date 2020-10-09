@@ -1,25 +1,17 @@
-import scrapy
-
 from tables.items import TableDataLoader, TableLoader
 from tables.spiders.default import DefaultSpider
 
 
-class FibaSpider(DefaultSpider):
-    name = 'fiba'
-    allowed_domains = ['fiba.basketball']
-    start_urls = ['https://www.fiba.basketball/rankingmen']
-
-    def start_requests(self):
-        url = self.start_urls[0]
-        if 'https://' in url:
-            url = url.replace('https://', 'https://webcache.googleusercontent.com/search?q=cache:')
-        yield scrapy.Request(url)
+class ChampionatSpider(DefaultSpider):
+    name = 'championat'
+    allowed_domains = ['championat.com']
+    start_urls = ['https://www.championat.com/tennis/rating/1/2020/0/']
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_css('title', 'li#fiba h5::text')
-        table_sel = response.css('li#fiba .fiba_ranking_table')
+        tl.add_css('title', '.entity-header__title-name::text')
+        table_sel = response.css('.page-main table:first-of-type')
 
         # head
         for row_sel in table_sel.css('thead tr'):
