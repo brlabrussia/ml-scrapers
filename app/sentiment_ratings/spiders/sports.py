@@ -9,24 +9,29 @@ class SportsSpider(scrapy.Spider):
 
     def start_requests(self):
         url = 'https://www.sports.ru/betting/ratings/'
-        yield scrapy.Request(url, self.parse_subjects)
+        yield scrapy.Request(url, self.parse_links)
 
-    def parse_subjects(self, response):
+    def parse_links(self, response):
         subject_blocks = response.css('.ratings-item__row')
         for sb in subject_blocks:
-            subject_url = sb.css('.ratings-item__buttons a::attr(href)').get()
-            yield response.follow(subject_url, self.parse_ratings)
+            url = sb.css('.ratings-item__buttons a::attr(href)').get()
+            yield response.follow(url, self.parse_items)
 
-    def parse_ratings(self, response):
-        rl = RatingLoader(response=response)
-        rl.add_value('url', response.url)
-        rl.add_css('subject', '.bookmaker-header-title__name::text')
-        rl.add_value('min', 0.5)
-        rl.add_value('max', 5)
-        rl.add_xpath('experts', '//div[normalize-space(text())="Оценка Sports.ru"]/..//div[has-class("bets-stars")]/@data-rating')
-        rl.add_xpath('users', '//div[normalize-space(text())="Оценка пользователей"]/..//div[has-class("bets-stars")]/@data-rating')
-        rl.add_xpath('reliability', '//div[normalize-space(text())="Надежность"]/..//div[has-class("bets-stars")]/@data-rating')
-        rl.add_xpath('variety', '//div[normalize-space(text())="Линии"]/..//div[has-class("bets-stars")]/@data-rating')
-        rl.add_xpath('ratio', '//div[normalize-space(text())="Коэффициенты"]/..//div[has-class("bets-stars")]/@data-rating')
-        rl.add_xpath('support', '//div[normalize-space(text())="Поддержка"]/..//div[has-class("bets-stars")]/@data-rating')
-        yield rl.load_item()
+    def parse_items(self, response):
+        sel = (
+            '//div[normalize-space(text())="{}"]'
+            '/..//div[has-class("bets-stars")]/@data-rating'
+        )
+        loader = RatingLoader(response=response)
+        loader.add_value('url', response.url)
+        loader.add_css('subject', '.bookmaker-header-title__name::text')
+        loader.add_value('min', 0.5)
+        loader.add_value('max', 5)
+        loader.add_xpath('experts', sel.format('Оценка Sports.ru'))
+        loader.add_xpath('users', sel.format('Оценка пользователей'))
+        loader.add_xpath('reliability', sel.format('Надежность'))
+        loader.add_xpath('variety', sel.format('Линии'))
+        loader.add_xpath('variety', sel.format('Live'))
+        loader.add_xpath('ratio', sel.format('Коэффициенты'))
+        loader.add_xpath('support', sel.format('Поддержка'))
+        yield loader.load_item()
