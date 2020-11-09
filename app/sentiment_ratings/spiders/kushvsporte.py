@@ -9,30 +9,36 @@ class KushvsporteSpider(scrapy.Spider):
 
     def start_requests(self):
         url = 'https://kushvsporte.ru/bookmaker/rating'
-        yield scrapy.Request(url, self.parse_subjects)
+        yield scrapy.Request(url, self.parse_links)
 
-    def parse_subjects(self, response):
+    def parse_links(self, response):
         subject_blocks = response.css('.blockBkList > *')
         for sb in subject_blocks:
-            subject_name = sb.css('h3::text').get()
-            subject_url = sb.css('a.btn-default::attr(href)').get()
+            subject = sb.css('h3::text').get()
+            url = sb.css('a.btn-default::attr(href)').get()
             yield response.follow(
-                subject_url,
-                self.parse_ratings,
-                cb_kwargs={'subject_name': subject_name},
+                url,
+                self.parse_items,
+                cb_kwargs={'subject': subject},
             )
 
-    def parse_ratings(self, response, subject_name):
-        rl = RatingLoader(response=response)
-        rl.add_value('url', response.url)
-        rl.add_value('subject', subject_name)
-        rl.add_value('min', 1)
-        rl.add_value('max', 5)
-        rl.add_css('users', '.iconinfoPageBK .ratingStarsCaption span::text')
-        rl.add_xpath('reliability', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Надежность"]/..//*[has-class("lbrating")]/text()')
-        rl.add_xpath('variety', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Линия в прематче"]/..//*[has-class("lbrating")]/text()')
-        rl.add_xpath('ratio', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Коэффициенты"]/..//*[has-class("lbrating")]/text()')
-        rl.add_xpath('withdrawal', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Удобство платежей"]/..//*[has-class("lbrating")]/text()')
-        rl.add_xpath('support', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Служба поддержки"]/..//*[has-class("lbrating")]/text()')
-        rl.add_xpath('bonuses', '//div[has-class("blockBKProgress")]/div[normalize-space(text())="Бонусы и акции"]/..//*[has-class("lbrating")]/text()')
-        yield rl.load_item()
+    def parse_items(self, response, subject):
+        sel = (
+            '//div[has-class("blockBKProgress")]'
+            '/div[normalize-space(text())="{}"]'
+            '/..//*[has-class("lbrating")]/text()'
+        )
+        loader = RatingLoader(response=response)
+        loader.add_value('url', response.url)
+        loader.add_value('subject', subject)
+        loader.add_value('min', 1)
+        loader.add_value('max', 5)
+        loader.add_css('users', '.iconinfoPageBK .ratingStarsCaption span::text')
+        loader.add_xpath('reliability', sel.format('Надежность'))
+        loader.add_xpath('variety', sel.format('Линия в прематче'))
+        loader.add_xpath('variety', sel.format('Линия в лайве'))
+        loader.add_xpath('ratio', sel.format('Коэффициенты'))
+        loader.add_xpath('withdrawal', sel.format('Удобство платежей'))
+        loader.add_xpath('support', sel.format('Служба поддержки'))
+        loader.add_xpath('bonuses', sel.format('Бонусы и акции'))
+        yield loader.load_item()
