@@ -1,3 +1,5 @@
+from distutils.util import strtobool
+
 import scrapy
 
 from sentiment_ru.items import ReviewLoader
@@ -35,5 +37,5 @@ class LegalbetSpider(scrapy.Spider):
 
         css = '[data-container-id=infinite-list]::attr(data-url)'
         next_page = response.css(css).get()
-        if self.crawl_deep and next_page:
+        if strtobool(str(self.crawl_deep)) and next_page:
             yield response.follow(next_page, self.parse_reviews)

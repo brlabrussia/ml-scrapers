@@ -1,4 +1,5 @@
 import json
+from distutils.util import strtobool
 
 import scrapy
 
@@ -45,7 +46,7 @@ class KushvsporteSpider(scrapy.Spider):
 
         css = '#list-reviews-pagination:not([data-urls="[]"])::attr(data-urls)'
         next_page = response.css(css).get()
-        if self.crawl_deep and next_page:
+        if strtobool(str(self.crawl_deep)) and next_page:
             next_page = json.loads(next_page)[0]
             cb_kwargs = {'subject_name': subject_name}
             yield response.follow(

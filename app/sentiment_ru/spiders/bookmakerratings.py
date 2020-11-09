@@ -1,3 +1,5 @@
+from distutils.util import strtobool
+
 import scrapy
 from furl import furl
 
@@ -50,7 +52,7 @@ class BookmakerratingsSpider(scrapy.Spider):
             rl.add_value('url', subject_url)
             yield rl.load_item()
 
-        if self.crawl_deep:
+        if strtobool(str(self.crawl_deep)):
             f = furl(args=response.request.body.decode())
             f.args['page'] = int(f.args['page']) + 1
             yield response.request.replace(body=f.querystr)
