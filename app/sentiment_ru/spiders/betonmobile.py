@@ -7,7 +7,11 @@ from sentiment_ru.items import ReviewLoader
 class BetonmobileSpider(scrapy.Spider):
     name = 'betonmobile'
     allowed_domains = ['betonmobile.ru']
-    custom_settings = {'CONCURRENT_REQUESTS': 1}
+    custom_settings = {
+        'CONCURRENT_REQUESTS': 1,
+        'RETRY_TIMES': 20,  # splash is reloaded on RAM and it takes time
+        'DOWNLOAD_DELAY': 0.25,  # wait between retries
+    }
     splash_args = {'wait': 5, 'images': 0}
 
     def start_requests(self):
@@ -19,12 +23,12 @@ class BetonmobileSpider(scrapy.Spider):
         )
 
     def parse_bookmakers(self, response):
-        bookmaker_blocks = response.css('.rb-tbody > tr')
+        bookmaker_blocks = response.css('.rb-tbody_new > tr')
         for bb in bookmaker_blocks:
-            comments = bb.css('.td-comments span::text').get()
+            comments = bb.css('.td-comments_new span::text').get()
             if comments == '0':
                 continue
-            link = bb.css('.td-view > a::attr(href)').get()
+            link = bb.css('.td-view_new > a::attr(href)').get()
             yield scrapy_splash.SplashRequest(
                 link,
                 self.parse_reviews,

@@ -1,5 +1,6 @@
 import json
 import re
+from distutils.util import strtobool
 from typing import Union
 from urllib.parse import unquote
 
@@ -78,7 +79,8 @@ class ItunesSpider(scrapy.Spider):
             yield rl.load_item()
 
         offset_current = furl(response.request.url).args.get('offset')
-        want_more = self.crawl_deep or (int(offset_current) < self.crawl_depth)
+        crawl_deep = strtobool(str(self.crawl_deep))
+        want_more = crawl_deep or (int(offset_current) < self.crawl_depth)
         next_url = response_json.get('next')
         if want_more and next_url:
             f = furl(response.request.url)

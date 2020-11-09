@@ -1,3 +1,5 @@
+from distutils.util import strtobool
+
 import scrapy
 from furl import furl
 
@@ -14,11 +16,14 @@ class VseprosportSpider(scrapy.Spider):
         yield scrapy.Request(url, callback=self.parse_subjects)
 
     def parse_subjects(self, response):
-        subject_blocks = response.css('.bookmeker_table_offer')
+        subject_blocks = response.css('.bookmakers-list .list-item')
         for sb in subject_blocks:
-            subject_url = sb.css('.bookmeker_table_offer_button a::attr(href)').get()
+            subject_urls = sb.css('a::attr(href)').re(r'/(reyting-bukmekerov/\w+)/?')
+            if not subject_urls:
+                continue
+            subject_url = subject_urls[0]
             subject_id = subject_url.split('/')[-1]
-            subject_name = sb.css('.bookmeker_table_offer_logo img::attr(title)').get()
+            subject_name = sb.css('.img::attr(title)').get()
 
             url = 'https://www.vseprosport.ru/get-bookmaker-comments-html'
             query = {'book': subject_id, 'offsetNews': 0}
@@ -49,7 +54,7 @@ class VseprosportSpider(scrapy.Spider):
             rl.add_value('url', response.urljoin(subject_url))
             yield rl.load_item()
 
-        if self.crawl_deep:
+        if strtobool(str(self.crawl_deep)):
             f = furl(response.request.url)
             f.args['offsetNews'] = int(f.args['offsetNews']) + 5
             yield response.request.replace(url=f.url)
