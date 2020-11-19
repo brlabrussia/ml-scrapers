@@ -83,6 +83,7 @@ class TableDataLoader(ItemLoader):
             normalize_tags,
             normalize_spaces,
             self.rel_to_abs,
+            lambda x: x.replace('&amp;', '&'),
         )
 
     def rel_to_abs(self, text: str) -> str:
