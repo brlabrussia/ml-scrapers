@@ -93,6 +93,7 @@ class WebhookPipeline:
             'comment': post.get('content_comment', ''),
             'content': post.get('content', ''),
             'create_dtime': post.get('time', ''),
+            'language': post.get('language', ''),
             'minuses': post.get('content_negative', ''),
             'pluses': post.get('content_positive', ''),
             'rating': post.get('rating'),

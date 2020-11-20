@@ -69,6 +69,7 @@ class ItunesSpider(scrapy.Spider):
             rl.add_value('author', attrs.get('userName'))
             rl.add_value('content', attrs.get('review'))
             rl.add_value('content_title', attrs.get('title'))
+            rl.add_value('language', 'ru')
             rl.add_value('rating', attrs.get('rating'))
             rl.add_value('rating_max', 5)
             rl.add_value('rating_min', 1)

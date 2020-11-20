@@ -43,6 +43,7 @@ class BookmakerratingsSpider(scrapy.Spider):
             rl.add_css('id', '::attr(id)', re=r'\d+$')
             rl.add_css('author', '.namelink::text')
             rl.add_css('content', '.content .text > *::text')
+            rl.add_value('language', 'ru')
             rl.add_css('rating', '.feedbacks-rating-stars .num::text')
             rl.add_value('rating_max', 5)
             rl.add_value('rating_min', 1)

@@ -29,6 +29,7 @@ class LegalbetSpider(scrapy.Spider):
             rl.add_css('author', '.author a.name::text')
             rl.add_css('content_positive', '.icon-plus + .description::text')
             rl.add_css('content_negative', '.icon-minus + .description::text')
+            rl.add_value('language', 'ru')
             rl.add_value('subject', subject_name)
             rl.add_css('time', '.author .date::text')
             rl.add_value('type', 'review')

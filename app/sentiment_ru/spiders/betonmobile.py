@@ -43,6 +43,7 @@ class BetonmobileSpider(scrapy.Spider):
             rl.add_css('id', '::attr(id)', re=r'\d+$')
             rl.add_css('author', '.comhed > .comaut::text')
             rl.add_css('content', '.comment-content > p::text')
+            rl.add_value('language', 'ru')
             rl.add_value('subject', subject)
             rl.add_css('time', '.comment-meta time::attr(datetime)')
             rl.add_value('type', 'review')

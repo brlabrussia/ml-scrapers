@@ -32,6 +32,7 @@ class Review(scrapy.Item):
     content_positive = scrapy.Field()
     content_negative = scrapy.Field()
     content_comment = scrapy.Field()
+    language = scrapy.Field()
     rating = scrapy.Field()
     rating_max = scrapy.Field()
     rating_min = scrapy.Field()

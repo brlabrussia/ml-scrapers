@@ -45,6 +45,7 @@ class VseprosportSpider(scrapy.Spider):
             rl.add_css('id', '.answers::attr(data-vps-comment-list)', re=r'\d+$')
             rl.add_xpath('author', './figure//h4/text()')
             rl.add_xpath('content', './p[has-class("message")]/text()')
+            rl.add_value('language', 'ru')
             rl.add_xpath('rating', './figure//div[has-class("star-rate")]/ul/b/text()', re=r'^(\d+)')
             rl.add_value('rating_max', 5)
             rl.add_value('rating_min', 1)

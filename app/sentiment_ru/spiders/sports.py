@@ -36,6 +36,7 @@ class SportsSpider(scrapy.Spider):
             rl.add_value('id', ar.get('id'))
             rl.add_value('author', ar.get('user').get('name'))
             rl.add_value('content', ar.get('content'))
+            rl.add_value('language', 'ru')
             rl.add_value('rating', ar.get('user_rating'))
             rl.add_value('rating_max', 5)
             rl.add_value('rating_min', 0.5)

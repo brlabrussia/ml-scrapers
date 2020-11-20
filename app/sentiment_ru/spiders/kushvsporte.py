@@ -35,6 +35,7 @@ class KushvsporteSpider(scrapy.Spider):
             rl.add_css('content_positive', '[itemprop=reviewBody] p:nth-of-type(1)::text')
             rl.add_css('content_negative', '[itemprop=reviewBody] p:nth-of-type(2)::text')
             rl.add_css('content_comment', '[itemprop=reviewBody] p:nth-of-type(3)::text')
+            rl.add_value('language', 'ru')
             rl.add_css('rating', '[itemprop=ratingValue]::attr(content)')
             rl.add_value('rating_max', 5)
             rl.add_value('rating_min', 1)
