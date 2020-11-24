@@ -32,13 +32,15 @@ class BankiAutoCreditsSpider(scrapy.Spider):
         )
         as_text = '/text()'
         as_list = '//ul/li/text()'
+        as_node = '/.'
 
         loader = AutoCreditLoader(response=response)
         loader.add_value('banki_url', response.url)
         loader.add_css('banki_bank_url', '.stella a::attr(href)', re=r'/banks/bank/[^/]+/')
+        loader.add_css('name', '.header-h0::text')
         loader.add_xpath('auto_seller', sel.format('Продавец', as_list))
         loader.add_xpath('auto_seller', sel.format('Продавец', as_text))
-        loader.add_xpath('auto_kind', sel.format('Вид транспортного средства', as_text))
+        loader.add_xpath('auto_kind', sel.format('Вид транспортного средства', '//text()'))
         loader.add_xpath('auto_type', sel.format('Тип транспортного средства', as_list))
         loader.add_xpath('auto_type', sel.format('Тип транспортного средства', as_text))
         loader.add_xpath('auto_age', sel.format('Возраст транспортного средства', as_text))
@@ -48,6 +50,7 @@ class BankiAutoCreditsSpider(scrapy.Spider):
         loader.add_xpath('autocredit_amount_min', sel.format('Сумма кредита', as_text), re=r'([^—]+)—')
         loader.add_xpath('autocredit_amount_min', sel.format('Сумма кредита', as_text), re=r'от\xa0([\d\xa0]+)')
         loader.add_xpath('autocredit_amount_max', sel.format('Сумма кредита', as_text), re=r'—([^—]+)')
+        loader.add_xpath('autocredit_amount_description', sel.format('Сумма кредита', as_node))
         loader.add_xpath('min_down_payment', sel.format('Минимальный первоначальный взнос', as_text), re=r'([\d,.]+)%')
         loader.add_xpath('loan_rate_min', sel.format('Cтавка по кредиту', as_text), re=r'([\d,.]+)—')
         loader.add_xpath('loan_rate_min', sel.format('Cтавка по кредиту', as_text), re=r'([\d,.]+)%')
@@ -59,11 +62,13 @@ class BankiAutoCreditsSpider(scrapy.Spider):
         loader.add_xpath('prepayment_penalty', sel.format('Штраф за досрочное погашение', as_text))
         loader.add_xpath('insurance_necessity', sel.format('Необходимость страхования', as_text))
         loader.add_xpath('borrowers_age', sel.format('Возраст заёмщика', as_text))
+        loader.add_xpath('borrowers_age_description', sel.format('Возраст заёмщика', as_node))
         loader.add_xpath('income_proof', sel.format('Подтверждение дохода', as_list))
-        loader.add_xpath('registration_requirements', sel.format('Регистрация по месту получения кредита', as_text))
+        loader.add_xpath('registration_requirements', sel.format('Регистрация по месту получения кредита', '//text()'))
         loader.add_xpath('last_work_experience', sel.format('Стаж работы на последнем месте', as_text))
         loader.add_xpath('full_work_experience', sel.format('Стаж работы общий', as_text))
         loader.add_xpath('additional_conditions', sel.format('Особые условия', as_text))
         loader.add_xpath('updated_at', sel.format('Дата актуализации', as_text))
+        loader.add_xpath('has_repurchase', sel.format('Возможность обратного выкупа', as_text))
 
         yield loader.load_item()

@@ -2,6 +2,7 @@ import re
 from typing import List, Optional
 from urllib.parse import unquote
 
+import bleach
 import dateparser
 from scrapy.item import Field, Item
 from scrapy.loader import ItemLoader
@@ -132,9 +133,20 @@ class DebitCard(Item):
     banki_url = Field()
     banki_bank_url = Field()
 
+    name = Field()
+    images = Field()
+    summary = Field()
+
+    borrower_age = Field()
+    borrower_registration = Field()
+    expert_positive = Field()
+    expert_negative = Field()
+    expert_restrictions = Field()
+
     debit_type = Field()
     technological_features = Field()
     debit_cashback = Field()
+    debit_cashback_description = Field()
     debit_bonuses = Field()
     interest_accrual = Field()
     service_cost = Field()
@@ -147,54 +159,24 @@ class DebitCard(Item):
     updated_at = Field()
 
 
-class BankiDebitCardLoader(ItemLoader):
-    default_item_class = DebitCard
-    default_input_processor = MapCompose(normalize_spaces)
-    default_output_processor = TakeFirst()
-
-    banki_bank_url_in = MapCompose(
-        normalize_spaces,
-        lambda x: ('https://www.banki.ru' + x) if x.startswith('/') else x,
-    )
-
-    debit_type_out = Identity()
-    technological_features_out = Identity()
-    debit_cashback_in = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    debit_cashback_out = Join(', ')
-    debit_bonuses_in = format_bonuses
-    debit_bonuses_out = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    interest_accrual_in = format_bonuses
-    interest_accrual_out = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    service_cost_in = Identity()
-    cash_withdrawal_in = MapCompose(int)
-    cash_pickup_point_in = MapCompose(
-        lambda x: x.replace(',', '.'),
-        float,
-    )
-    cash_pickup_point_out = Identity()
-    foreign_cash_withdrawal_in = Identity()
-    foreign_cash_pickup_point_in = Identity()
-    operations_limit_in = Identity()
-    additional_information_out = Identity()
-    updated_at_in = MapCompose(format_date)
-
-
 class CreditCard(Item):
     banki_url = Field()
     banki_bank_url = Field()
 
+    name = Field()
+    images = Field()
+    summary = Field()
+
+    borrower_age = Field()
+    borrower_registration = Field()
+    expert_positive = Field()
+    expert_negative = Field()
+    expert_restrictions = Field()
+
     credit_type = Field()
     technological_features = Field()
     credit_cashback = Field()
+    credit_cashback_description = Field()
     credit_bonuses = Field()
     interest_accrual = Field()
     service_cost = Field()
@@ -206,58 +188,26 @@ class CreditCard(Item):
     additional_information = Field()
     updated_at = Field()
 
+    borrower_income = Field()
+    borrower_experience = Field()
+    credit_limit = Field()
+    credit_limit_description = Field()
+    credit_period = Field()
+    grace_period = Field()
+    percentage_grace = Field()
+    percentage_grace_description = Field()
+    percentage_credit = Field()
+    percentage_credit_description = Field()
+    repayment = Field()
+    repayment_description = Field()
     own_funds = Field()
-
-
-class BankiCreditCardLoader(ItemLoader):
-    default_item_class = CreditCard
-    default_input_processor = MapCompose(normalize_spaces)
-    default_output_processor = TakeFirst()
-
-    banki_bank_url_in = MapCompose(
-        normalize_spaces,
-        lambda x: ('https://www.banki.ru' + x) if x.startswith('/') else x,
-    )
-
-    credit_type_out = Identity()
-    technological_features_out = Identity()
-    credit_cashback_in = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    credit_cashback_out = Join(', ')
-    credit_bonuses_in = format_bonuses
-    credit_bonuses_out = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    interest_accrual_in = format_bonuses
-    interest_accrual_out = MapCompose(
-        normalize_spaces,
-        lambda x: x if x else None,
-    )
-    service_cost_in = Identity()
-    cash_withdrawal_in = MapCompose(int)
-    cash_pickup_point_in = MapCompose(
-        lambda x: x.replace(',', '.'),
-        float,
-    )
-    cash_pickup_point_out = Identity()
-    foreign_cash_withdrawal_in = Identity()
-    foreign_cash_pickup_point_in = Identity()
-    operations_limit_in = Identity()
-    additional_information_out = Identity()
-    updated_at_in = MapCompose(format_date)
-
-    own_funds_in = MapCompose(
-        normalize_spaces,
-        lambda x: True if x == 'возможно' else False,
-    )
 
 
 class AutoCredit(Item):
     banki_url = Field()
     banki_bank_url = Field()
+
+    name = Field()
 
     auto_seller = Field()
     auto_kind = Field()
@@ -268,6 +218,7 @@ class AutoCredit(Item):
     autocredit_currency = Field()
     autocredit_amount_min = Field()
     autocredit_amount_max = Field()
+    autocredit_amount_description = Field()
     min_down_payment = Field()
     loan_rate_min = Field()
     loan_rate_max = Field()
@@ -277,12 +228,15 @@ class AutoCredit(Item):
     prepayment_penalty = Field()
     insurance_necessity = Field()
     borrowers_age = Field()
+    borrowers_age_description = Field()
     income_proof = Field()
     registration_requirements = Field()
     last_work_experience = Field()
     full_work_experience = Field()
     additional_conditions = Field()
     updated_at = Field()
+
+    has_repurchase = Field()
 
 
 class AutoCreditLoader(ItemLoader):
@@ -301,6 +255,7 @@ class AutoCreditLoader(ItemLoader):
     auto_kind_in = MapCompose(
         lambda x: x.split(';'),
         normalize_spaces,
+        lambda x: x if x else None,
     )
     auto_kind_out = Identity()
     auto_type_in = MapCompose(
@@ -313,9 +268,18 @@ class AutoCreditLoader(ItemLoader):
         normalize_spaces,
     )
     auto_age_out = Identity()
-    autocredit_amount_min = MapCompose(
+    autocredit_amount_min_in = MapCompose(
         normalize_spaces,
-        lambda x: x.replace('\xa0', ' '),
+        # lambda x: x.replace('\xa0', ' '),
+    )
+    autocredit_amount_description_in = MapCompose(
+        lambda x: x.split('<br>'),
+        lambda x: bleach.clean(x, tags=[], strip=True),
+        normalize_spaces,
+        # lambda x: x.replace('\xa0', ' '),
+    )
+    autocredit_amount_description_out = Compose(
+        lambda x: ' '.join(x[1:]) if len(x) > 1 else None,
     )
     min_down_payment_in = MapCompose(
         lambda x: x.replace(',', '.'),
@@ -332,8 +296,26 @@ class AutoCreditLoader(ItemLoader):
         normalize_spaces,
         lambda x: True if x == 'да' else False,
     )
+    borrowers_age_description_in = MapCompose(
+        lambda x: x.split('<br>'),
+        lambda x: bleach.clean(x, tags=[], strip=True),
+        normalize_spaces,
+    )
+    borrowers_age_description_out = Compose(
+        lambda x: ' '.join(x[1:]) if len(x) > 1 else None,
+    )
     income_proof_out = Identity()
+    registration_requirements_in = MapCompose(
+        normalize_spaces,
+        lambda x: x if x else None,
+    )
+    registration_requirements_out = Identity()
     updated_at_in = MapCompose(format_date)
+
+    has_repurchase_in = MapCompose(
+        normalize_spaces,
+        lambda x: True if x == 'да' else False,
+    )
 
 
 class ConsumerCredit(Item):
