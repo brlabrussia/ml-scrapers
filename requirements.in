@@ -3,6 +3,7 @@ dateparser==0.7.*
 furl==2.1.*
 openpyxl==3.0.*
 pillow==7.1.*
+premailer==3.7.*
 requests==2.23.*
 scrapy-splash==0.7.*
 scrapy==1.8.*

@@ -1,17 +1,33 @@
-from tables.items import TableDataLoader, TableLoader
+import re
+
+from scrapy.loader.processors import Compose
+
+from tables.items_ import TableDataLoader, TableLoader
 from tables.spiders.default import DefaultSpider
+from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
 class FifaSpider(DefaultSpider):
     name = 'fifa'
     allowed_domains = ['fifa.com']
     start_urls = ['https://www.fifa.com/fifa-world-ranking/ranking-table/men/']
+    post_processor = Compose(
+        BASIC_POST_PROCESSOR,
+        lambda x: re.sub(r'<abbr.*?</abbr>', r'', x, flags=re.S),
+        lambda x: re.sub(r'border[^;"]+?;\s?', r'', x, flags=re.S),
+    )
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
         tl.add_css('title', '.fi-ranking-schedule__title::text')
+        tl.add_xpath('extra', '//svg[has-class("fi-module-ranking__ranking__item__arrow")]/defs/..')
         table_sel = response.css('#rank-table')
+        table_sel = prepare_table_selector(
+            table_sel,
+            response,
+            post_processor=self.post_processor,
+        )
 
         # head
         for row_sel in table_sel.css('thead tr'):
@@ -21,6 +37,7 @@ class FifaSpider(DefaultSpider):
                 tdl.base_url = response.url
                 tdl.add_xpath('value', './node()')
                 tdl.add_value('value', '')
+                tdl.add_xpath('style', './@style')
                 tdl.add_xpath('colspan', './@colspan')
                 tdl.add_xpath('rowspan', './@rowspan')
                 row_loaders.append(tdl)
@@ -34,9 +51,17 @@ class FifaSpider(DefaultSpider):
                 tdl.base_url = response.url
                 tdl.add_xpath('value', './node()')
                 tdl.add_value('value', '')
+                tdl.add_xpath('style', './@style')
                 tdl.add_xpath('colspan', './@colspan')
                 tdl.add_xpath('rowspan', './@rowspan')
                 row_loaders.append(tdl)
-            tl.add_value('body', [row_loaders])
+                if (
+                    len(self.args) != 0
+                    and data_sel.css('.fi-table__confederation')
+                    and f'#{self.args[0]}#' != data_sel.css('.text::text').get()
+                ):
+                    break
+            else:
+                tl.add_value('body', [row_loaders])
 
         yield tl.load_item()
