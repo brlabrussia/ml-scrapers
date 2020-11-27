@@ -56,9 +56,10 @@ class FifaSpider(DefaultSpider):
                 tdl.add_xpath('rowspan', './@rowspan')
                 row_loaders.append(tdl)
                 if (
-                    len(self.args) != 0
-                    and data_sel.css('.fi-table__confederation')
-                    and f'#{self.args[0]}#' != data_sel.css('.text::text').get()
+                    hasattr(self, 'args')
+                    and len(self.args) != 0
+                    and 'display:none;' in data_sel.css('::attr(style)').get()
+                    and f'#{self.args[0]}#' != data_sel.css('span::text').get()
                 ):
                     break
             else:
