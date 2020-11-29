@@ -1,13 +1,13 @@
 import re
 
+import scrapy
 from scrapy.loader.processors import Compose
 
 from tables.items_ import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
-class FifaSpider(DefaultSpider):
+class FifaSpider(scrapy.Spider):
     name = 'fifa'
     allowed_domains = ['fifa.com']
     start_urls = ['https://www.fifa.com/fifa-world-ranking/ranking-table/men/']
@@ -56,10 +56,9 @@ class FifaSpider(DefaultSpider):
                 tdl.add_xpath('rowspan', './@rowspan')
                 row_loaders.append(tdl)
                 if (
-                    hasattr(self, 'args')
-                    and len(self.args) != 0
+                    hasattr(self, 'table_name')
                     and 'display:none;' in data_sel.css('::attr(style)').get()
-                    and f'#{self.args[0]}#' != data_sel.css('span::text').get()
+                    and f'#{self.table_name}#' != data_sel.css('span::text').get()
                 ):
                     break
             else:

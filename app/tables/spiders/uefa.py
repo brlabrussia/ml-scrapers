@@ -1,10 +1,9 @@
 import scrapy
 
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class UefaSpider(DefaultSpider):
+class UefaSpider(scrapy.Spider):
     name = 'uefa'
     allowed_domains = ['uefa.com']
     start_urls = ['https://ru.uefa.com/memberassociations/uefarankings/country/#/yr/2020']

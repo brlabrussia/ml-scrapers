@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class BsrussiaSpider(DefaultSpider):
+class BsrussiaSpider(scrapy.Spider):
     name = 'bsrussia'
     allowed_domains = ['bsrussia.com']
     start_urls = ['https://bsrussia.com/ratings/mirovoy-reyting']

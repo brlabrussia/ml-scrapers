@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class IsuresultsSpider(DefaultSpider):
+class IsuresultsSpider(scrapy.Spider):
     name = 'isuresults'
     allowed_domains = ['isuresults.com']
     start_urls = ['http://www.isuresults.com/ws/ws/wsmen.htm']

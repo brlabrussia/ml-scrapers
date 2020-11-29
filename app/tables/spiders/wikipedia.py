@@ -1,18 +1,19 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class WikipediaSpider(DefaultSpider):
+class WikipediaSpider(scrapy.Spider):
     name = 'wikipedia'
     allowed_domains = ['wikipedia.org']
     start_urls = ['https://ru.wikipedia.org/wiki/Рейтинг_WBC']
-    args = ['Первый тяжёлый вес']
+    table_name = 'Первый тяжёлый вес'
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_value('title', self.args[0])
-        xp = f'//*[@class="mw-headline"][normalize-space(text())="{self.args[0]}"]/ancestor::h2/following-sibling::table[1]'
+        tl.add_value('title', self.table_name)
+        xp = f'//*[@class="mw-headline"][normalize-space(text())="{self.table_name}"]/ancestor::h2/following-sibling::table[1]'
         table_sel = response.xpath(xp)
 
         # head

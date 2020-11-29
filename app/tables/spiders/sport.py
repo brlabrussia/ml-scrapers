@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class SportSpider(DefaultSpider):
+class SportSpider(scrapy.Spider):
     name = 'sport'
     allowed_domains = ['sport.ru', 'google.com']
     start_urls = ['https://www.sport.ru/tennis/wta/rating-gonka/']

@@ -1,18 +1,19 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class Wikipedia2Spider(DefaultSpider):
+class Wikipedia2Spider(scrapy.Spider):
     name = 'wikipedia2'
     allowed_domains = ['wikipedia.org']
     start_urls = ['https://ru.wikipedia.org/wiki/Клуб_Льва_Яшина']
-    args = ['Состав Клуба Льва Яшина']
+    table_name = 'Состав Клуба Льва Яшина'
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_value('title', self.args[0])
-        xp = f'//*[@class="mw-headline"][normalize-space(text())="{self.args[0]}"]/ancestor::h2/following-sibling::table[has-class("sortable")][1]'
+        tl.add_value('title', self.table_name)
+        xp = f'//*[@class="mw-headline"][normalize-space(text())="{self.table_name}"]/ancestor::h2/following-sibling::table[has-class("sortable")][1]'
         table_sel = response.xpath(xp)
 
         # head

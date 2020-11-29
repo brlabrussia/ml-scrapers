@@ -1,13 +1,13 @@
 import re
 
+import scrapy
 from scrapy.loader.processors import Compose
 
 from tables.items_ import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
-class CybersportSpider(DefaultSpider):
+class CybersportSpider(scrapy.Spider):
     name = 'cybersport'
     allowed_domains = ['cybersport.ru']
     start_urls = ['https://www.cybersport.ru/base/gamers?page=1&disciplines=21']

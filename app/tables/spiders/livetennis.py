@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class LivetennisSpider(DefaultSpider):
+class LivetennisSpider(scrapy.Spider):
     name = 'livetennis'
     allowed_domains = ['live-tennis.eu']
     start_urls = ['https://live-tennis.eu/ru/official-atp-ranking']

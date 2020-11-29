@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class ChampionatSpider(DefaultSpider):
+class ChampionatSpider(scrapy.Spider):
     name = 'championat'
     allowed_domains = ['championat.com']
     start_urls = ['https://www.championat.com/tennis/rating/1/2020/0/']

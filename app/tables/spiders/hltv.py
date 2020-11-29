@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class HltvSpider(DefaultSpider):
+class HltvSpider(scrapy.Spider):
     name = 'hltv'
     allowed_domains = ['hltv.org']
     start_urls = ['https://www.hltv.org/ranking/teams/']

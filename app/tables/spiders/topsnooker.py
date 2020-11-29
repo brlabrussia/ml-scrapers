@@ -1,8 +1,9 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class TopsnookerSpider(DefaultSpider):
+class TopsnookerSpider(scrapy.Spider):
     name = 'topsnooker'
     allowed_domains = ['topsnooker.com']
     start_urls = ['http://top-snooker.com/world-rankings/']

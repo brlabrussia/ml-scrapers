@@ -1,19 +1,20 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class UfcSpider(DefaultSpider):
+class UfcSpider(scrapy.Spider):
     name = 'ufc'
     allowed_domains = ['bsrussia.com']
     start_urls = ['https://ru.ufc.com/rankings']
-    args = ['Полусредний вес']
+    table_name = 'Полусредний вес'
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_value('title', self.args[0])
-        # xp = f'//*[@class="view-grouping-header"][normalize-space(text())="{self.args[0]}"]/following-sibling::*[@class="view-grouping-content"]'
-        xp = f'//*[@class="info"]/h4[normalize-space(text())="{self.args[0]}"]/ancestor::table'
+        tl.add_value('title', self.table_name)
+        # xp = f'//*[@class="view-grouping-header"][normalize-space(text())="{self.table_name}"]/following-sibling::*[@class="view-grouping-content"]'
+        xp = f'//*[@class="info"]/h4[normalize-space(text())="{self.table_name}"]/ancestor::table'
         table_sel = response.xpath(xp)
 
         # upper body

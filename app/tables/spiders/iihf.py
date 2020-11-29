@@ -1,19 +1,20 @@
+import scrapy
+
 from tables.items import TableDataLoader, TableLoader
-from tables.spiders.default import DefaultSpider
 
 
-class IihfSpider(DefaultSpider):
+class IihfSpider(scrapy.Spider):
     name = 'iihf'
     allowed_domains = ['iihf.com']
     start_urls = ['https://www.iihf.com/en/worldranking']
-    args = ["2020 Men's World Ranking"]
+    table_name = "2020 Men's World Ranking"
 
     def parse(self, response):
         tl = TableLoader(response=response)
         tl.add_value('url', response.url)
-        tl.add_value('title', self.args[0])
+        tl.add_value('title', self.table_name)
         xp = '//*[@class="s-title"][normalize-space(text())="{}"]/following-sibling::table[1]'
-        table_sel = response.xpath(xp.format(self.args[0]))
+        table_sel = response.xpath(xp.format(self.table_name))
 
         # head
         for row_sel in table_sel.css('thead tr'):
