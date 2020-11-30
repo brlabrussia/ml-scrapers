@@ -3,7 +3,7 @@ import io
 import openpyxl
 import scrapy
 
-from mfodb.items import CbrLoader
+from mfo.items import CbrLoader
 
 
 class CbrSpider(scrapy.Spider):

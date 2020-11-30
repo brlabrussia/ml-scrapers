@@ -1,6 +1,6 @@
 import scrapy
 
-from mfodb.items import ZaymovLoader
+from mfo.items import ZaymovLoader
 
 
 class ZaymovSpider(scrapy.Spider):

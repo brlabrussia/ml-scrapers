@@ -1,6 +1,6 @@
 import scrapy
 
-from mfodb.items import BankiLoader
+from mfo.items import BankiLoader
 
 
 class BankiSpider(scrapy.Spider):

@@ -2,7 +2,7 @@ import requests
 import scrapy
 from scrapy.selector import Selector
 
-from mfodb.items import VsezaimyonlineLoader
+from mfo.items import VsezaimyonlineLoader
 
 
 class VsezaimyonlineSpider(scrapy.Spider):
