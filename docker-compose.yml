@@ -8,8 +8,8 @@ networks:
 services:
   scrapy:
     build: ./app/
-    volumes:
-      - ./app/:/home/user/app/:cached
+    # volumes:
+    #   - ./app/:/home/user/app/:cached
     expose:
       - 6800
     networks:
