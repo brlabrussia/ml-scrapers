@@ -1,6 +1,6 @@
 import scrapy
 
-from casinodb.settings import CASINOGURU_CUSTOM_SETTINGS
+from casino.settings import CASINOGURU_CUSTOM_SETTINGS
 
 
 class CasinoguruSlotsSpider(scrapy.Spider):
