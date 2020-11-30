@@ -6,4 +6,4 @@ if [ -z $SCRAPY_PROJECT ]; then
 fi
 
 service_command="SCRAPY_PROJECT=$SCRAPY_PROJECT scrapy $@"
-docker-compose exec app sh -c "$service_command"
+docker-compose exec scrapy sh -c "$service_command"

@@ -18,4 +18,4 @@ case $1 in
         ;;
 esac
 
-docker-compose exec app sh -c "$service_command"
+docker-compose exec scrapy sh -c "$service_command"

@@ -1,27 +1,27 @@
 version: '3'
 
+networks:
+  traefik:
+    external:
+      name: traefik_network
+
 services:
-  app:
-    build:
-      context: .
-      args:
-        - user_uid=${user_uid:-1000}
-        - user_gid=${user_gid:-1000}
+  scrapy:
+    build: ./app/
     volumes:
       - ./app/:/home/user/app/:cached
     expose:
       - 6800
     networks:
-      - inner_network
-      - traefik_network
+      - default
+      - traefik
     labels:
       - traefik.enable=true
       - traefik.http.routers.scrapy_https.rule=Host("$VIRTUAL_HOST")
       - traefik.http.routers.scrapy_https.tls.certresolver=httpchallenge_0
       - traefik.http.routers.scrapy_https.middlewares=scrapy_auth
       - traefik.http.middlewares.scrapy_auth.basicauth.usersfile=/etc/traefik/.htpasswd
-    env_file:
-      - .env
+    env_file: .env
     command: scrapyd
     restart: always
 
@@ -29,14 +29,5 @@ services:
     image: scrapinghub/splash:3.5.0
     expose:
       - 8050
-    networks:
-      - inner_network
     command: --max-timeout 15 --maxrss 750
     restart: always
-
-networks:
-  inner_network:
-    driver: bridge
-  traefik_network:
-    external:
-      name: traefik_network
