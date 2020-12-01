@@ -17,6 +17,7 @@ cssselect==1.1.0          # via parsel, premailer, scrapy
 cssutils==1.0.2           # via premailer
 dateparser==0.7.4         # via -r requirements.in
 et-xmlfile==1.0.1         # via openpyxl
+funcy==1.15               # via -r requirements.in
 furl==2.1.0               # via -r requirements.in
 hyperlink==19.0.0         # via twisted
 idna==2.9                 # via hyperlink, requests

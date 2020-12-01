@@ -1,5 +1,6 @@
 bleach==3.2.*
 dateparser==0.7.*
+funcy==1.*
 furl==2.1.*
 openpyxl==3.0.*
 pillow==7.1.*
