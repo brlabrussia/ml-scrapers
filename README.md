@@ -4,13 +4,13 @@
 ## Quick Start
 ```shell
 cp .env.example .env  # копируем дефолтные переменные среды
-scripts/compose up -d --build  # хелпер для запуска сервиса с корректными пермишенами
+docker-compose up -d --build  # запуск сервисов в фоне
 export SCRAPY_PROJECT=sentiment_ru  # задаем sentiment_ru в качестве проекта
-scripts/scrapyd list  # смотрим какие спайдеры доступны
+scripts/scrapy list  # смотрим какие спайдеры доступны
 scripts/scrapyd crawl itunes  # запускаем спайдер itunes
 ```
 Посмотреть логи и собранные айтемы можно в:
-- директории `./app/.scrapyd/`;
+- директории `./app/.scrapyd/` при условии что раскомментили в docker-compose.yml;
 - админке https://scrapy.localhost/ (имя и пароль - те, что использовались при настройке Traefik).
 
 ## API
