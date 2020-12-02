@@ -21,6 +21,9 @@ services:
       - traefik.http.routers.scrapy_https.tls.certresolver=httpchallenge_0
       - traefik.http.routers.scrapy_https.middlewares=scrapy_auth
       - traefik.http.middlewares.scrapy_auth.basicauth.usersfile=/etc/traefik/.htpasswd
+      - traefik.http.routers.scrapy_http.rule=Host("$VIRTUAL_HOST")
+      - traefik.http.routers.scrapy_http.middlewares=scrapy_redirect
+      - traefik.http.middlewares.scrapy_redirect.redirectscheme.scheme=https
     env_file: .env
     command: scrapyd
     restart: always
