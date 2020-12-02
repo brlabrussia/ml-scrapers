@@ -1,5 +1,6 @@
 import re
 from typing import Optional
+from urllib.parse import unquote, urljoin
 
 import dateparser
 from scrapy.loader import ItemLoader
@@ -26,6 +27,16 @@ def format_date(date: str) -> Optional[str]:
     settings = {'TIMEZONE': 'Europe/Moscow', 'RETURN_AS_TIMEZONE_AWARE': True}
     date = dateparser.parse(normalize_space(date), settings=settings)
     return None if date is None else date.isoformat()
+
+
+def format_url(url: str, loader_context: dict) -> Optional[str]:
+    if loader_context.get('response'):
+        base = loader_context['response'].url
+    elif loader_context.get('url'):
+        base = loader_context['url']
+    else:
+        return None
+    return unquote(urljoin(base, url))
 
 
 class DefaultLoader(ItemLoader):
