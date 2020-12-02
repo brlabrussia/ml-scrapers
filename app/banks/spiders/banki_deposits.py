@@ -2,22 +2,63 @@ import json
 from urllib.parse import unquote, urlparse
 
 import scrapy
+from funcy import rcompose
+from scrapy.loader.processors import Identity, Join, MapCompose
 
-from banks.items import DepositLoader
+from banks.items import Deposit
+from default.items import DefaultLoader, drop_blank, format_date, format_url
 
 
-class BankiDepositsSpider(scrapy.Spider):
+class Loader(DefaultLoader):
+    default_item_class = Deposit
+
+    banki_bank_url_in = MapCompose(format_url)
+    is_staircase_contribution_in = MapCompose(
+        DefaultLoader.default_input_processor,
+        str.lower,
+        lambda x: True if x == 'да' else False,
+    )
+    replenishment_ability_in = MapCompose(
+        DefaultLoader.default_input_processor,
+        str.lower,
+        rcompose(
+            r'^(нет$|возможно$|возможно, но)',
+            {'нет': 0, 'возможно': 1, 'возможно, но': 2, None: None},
+        ),
+    )
+    rates_comments_in = MapCompose(
+        str.splitlines,
+        lambda x: x.lstrip('* '),
+        drop_blank,
+    )
+    auto_prolongation_in = MapCompose(
+        DefaultLoader.default_input_processor,
+        str.lower,
+        rcompose(
+            r'^(невозможна|возможна)$',
+            {'невозможна': 0, 'возможна': 1, None: None},
+        ),
+    )
+    updated_at_in = MapCompose(format_date)
+
+    _ = \
+        special_conditions_out = \
+        rates_table_in = \
+        rates_comments_out = \
+        Identity()
+
+    _ = \
+        deposit_amount_out = \
+        deposit_term_out = \
+        capitalization_out = \
+        replenishment_description_out = \
+        partial_withdrawal_description_out = \
+        Join()
+
+
+class Spider(scrapy.Spider):
     name = 'banki_deposits'
     allowed_domains = ['banki.ru']
-    test_urls = [
-        'https://www.banki.ru/products/deposits/deposit/14907/',
-        'https://www.banki.ru/specials/deposits/vklad-optimalnii_na_tri_god/',
-        'https://www.banki.ru/products/deposits/deposit/290/',
-        'https://www.banki.ru/products/deposits/deposit/19081/',
-        'https://www.banki.ru/products/deposits/deposit/20376/',
-        'https://www.banki.ru/products/deposits/deposit/253/',
-        'https://www.banki.ru/products/deposits/deposit/19813/',
-    ]
 
     def start_requests(self):
         url = 'https://www.banki.ru/banks/'
@@ -49,9 +90,10 @@ class BankiDepositsSpider(scrapy.Spider):
             yield response.follow(link, self.parse_items)
 
     def parse_items(self, response):
-        loader = DepositLoader(response=response)
+        loader = Loader(response=response)
         loader.add_value('banki_url', response.url)
         loader.add_xpath('banki_bank_url', '//h1/ancestor::header/following-sibling::div//a/@href')
+        loader.add_css('name', '[data-test=deposit-header-title]::text')
 
         try:
             module_options = response.css('[data-module*=DepositsBundle]::attr(data-module-options)').get()
@@ -78,8 +120,9 @@ class BankiDepositsSpider(scrapy.Spider):
         )
         as_text = '//text()'
         as_list = '//ul/li/text()'
-        as_note = '//p/text()'
+        as_note = '//div//text()'
         loader.add_xpath('interest_payment', sel.format('Выплата процентов', as_text))
+        loader.add_xpath('interest_payment_description', sel.format('Выплата процентов', as_note))
         loader.add_xpath('capitalization', sel.format('Капитализация', as_text))
         loader.add_xpath('special_contribution', sel.format('Специальный вклад', as_text))
         loader.add_xpath('is_staircase_contribution', sel.format('Лестничный вклад', as_text))
@@ -91,6 +134,9 @@ class BankiDepositsSpider(scrapy.Spider):
         loader.add_xpath('early_dissolution_description', sel.format('Досрочное расторжение', as_note))
         loader.add_xpath('auto_prolongation', sel.format('Автопролонгация', as_text))
         loader.add_xpath('auto_prolongation_description', sel.format('Автопролонгация', as_note))
+        loader.add_xpath('partial_withdrawal', sel.format('Частичное снятие', as_text))
+        loader.add_xpath('partial_withdrawal_description', sel.format('Частичное снятие', f'//*{as_text}'))
+        loader.add_xpath('online_opening', sel.format('Открытие вклада online', as_text))
         loader.add_css('updated_at', '.expand-content span::text', re=r'Дата актуализации: (.+)\.\s')
 
         yield loader.load_item()

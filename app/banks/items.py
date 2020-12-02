@@ -389,11 +389,13 @@ class Deposit(Item):
     banki_url = Field()
     banki_bank_url = Field()
 
+    name = Field()
     deposit_amount = Field()
     deposit_currency = Field()
     deposit_term = Field()
 
     interest_payment = Field()
+    interest_payment_description = Field()
     capitalization = Field()
     special_contribution = Field()
     is_staircase_contribution = Field()
@@ -407,52 +409,7 @@ class Deposit(Item):
     auto_prolongation_description = Field()
     rates_table = Field()
     rates_comments = Field()
+    online_opening = Field()
+    partial_withdrawal = Field()
+    partial_withdrawal_description = Field()
     updated_at = Field()
-
-
-class DepositLoader(ItemLoader):
-    default_item_class = Deposit
-    default_input_processor = MapCompose(
-        normalize_spaces,
-        drop_blanks,
-    )
-    default_output_processor = TakeFirst()
-
-    banki_bank_url_in = MapCompose(
-        lambda x: ('https://www.banki.ru' + x) if x.startswith('/') else x,
-    )
-
-    deposit_amount_out = Join()
-    deposit_term_out = Join()
-
-    capitalization_out = Join()
-    is_staircase_contribution_in = MapCompose(
-        normalize_spaces,
-        lambda x: True if x.lower() == 'да' else False,
-    )
-    special_conditions_out = Identity()
-    replenishment_ability_in = MapCompose(
-        normalize_spaces,
-        drop_blanks,
-        lambda x: 1 if x.lower() == 'возможно' else (
-            0 if x.lower() == 'нет' else (
-                2 if x.lower().startswith('возможно, но') else None
-            )
-        ),
-    )
-    replenishment_description_out = Join()
-    rates_table_in = Identity()
-    rates_comments_in = MapCompose(
-        str.splitlines,
-        lambda x: x.lstrip('* '),
-        drop_blanks,
-    )
-    rates_comments_out = Identity()
-    auto_prolongation_in = MapCompose(
-        normalize_spaces,
-        drop_blanks,
-        lambda x: 1 if x.lower() == 'возможна' else (
-            0 if x.lower() == 'невозможна' else None
-        ),
-    )
-    updated_at_in = MapCompose(format_date)
