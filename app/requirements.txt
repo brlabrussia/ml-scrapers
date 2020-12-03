@@ -6,6 +6,7 @@
 #
 attrs==19.3.0             # via automat, service-identity, twisted
 automat==20.2.0           # via twisted
+backcall==0.2.0           # via ipython
 bleach==3.2.1             # via -r requirements.in
 cachetools==4.1.1         # via premailer
 certifi==2019.11.28       # via requests
@@ -16,25 +17,35 @@ cryptography==2.8         # via pyopenssl, scrapy, service-identity
 cssselect==1.1.0          # via parsel, premailer, scrapy
 cssutils==1.0.2           # via premailer
 dateparser==0.7.4         # via -r requirements.in
+decorator==4.4.2          # via ipython
 et-xmlfile==1.0.1         # via openpyxl
 funcy==1.15               # via -r requirements.in
 furl==2.1.0               # via -r requirements.in
 hyperlink==19.0.0         # via twisted
 idna==2.9                 # via hyperlink, requests
 incremental==17.5.0       # via twisted
+ipython-genutils==0.2.0   # via traitlets
+ipython==7.19.0           # via -r requirements.in
 jdcal==1.4.1              # via openpyxl
+jedi==0.17.2              # via ipython
 lxml==4.5.0               # via parsel, premailer, scrapy
 openpyxl==3.0.4           # via -r requirements.in
 orderedmultidict==1.0.1   # via furl
 packaging==20.4           # via bleach
 parsel==1.5.2             # via scrapy
+parso==0.7.1              # via jedi
+pexpect==4.8.0            # via ipython
+pickleshare==0.7.5        # via ipython
 pillow==7.1.2             # via -r requirements.in
 premailer==3.7.0          # via -r requirements.in
+prompt-toolkit==3.0.8     # via ipython
 protego==0.1.16           # via scrapy
+ptyprocess==0.6.0         # via pexpect
 pyasn1-modules==0.2.8     # via service-identity
 pyasn1==0.4.8             # via pyasn1-modules, service-identity
 pycparser==2.20           # via cffi
 pydispatcher==2.0.5       # via scrapy
+pygments==2.7.2           # via ipython
 pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via scrapy
 pyparsing==2.4.7          # via packaging
@@ -48,10 +59,12 @@ scrapy==1.8.0             # via -r requirements.in, scrapyd
 scrapyd==1.2.1            # via -r requirements.in
 service-identity==18.1.0  # via scrapy
 six==1.14.0               # via automat, bleach, cryptography, furl, orderedmultidict, packaging, parsel, protego, pyopenssl, python-dateutil, scrapy, scrapyd, w3lib
+traitlets==5.0.5          # via ipython
 twisted==20.3.0           # via scrapy, scrapyd
 tzlocal==2.0.0            # via dateparser
 urllib3==1.25.8           # via requests
 w3lib==1.21.0             # via parsel, scrapy
+wcwidth==0.2.5            # via prompt-toolkit
 webencodings==0.5.1       # via bleach
 zope.interface==5.0.2     # via scrapy, twisted
 
