@@ -389,7 +389,9 @@ class Deposit(Item):
     banki_url = Field()
     banki_bank_url = Field()
 
-    name = Field()
+    name_base = Field()
+    name_full = Field()
+
     deposit_amount = Field()
     deposit_currency = Field()
     deposit_term = Field()
@@ -398,6 +400,7 @@ class Deposit(Item):
     interest_payment_description = Field()
     capitalization = Field()
     special_contribution = Field()
+    special_contribution_description = Field()
     is_staircase_contribution = Field()
     special_conditions = Field()
     replenishment_ability = Field()

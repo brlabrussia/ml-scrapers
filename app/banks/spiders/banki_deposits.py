@@ -93,7 +93,8 @@ class Spider(scrapy.Spider):
         loader = Loader(response=response)
         loader.add_value('banki_url', response.url)
         loader.add_xpath('banki_bank_url', '//h1/ancestor::header/following-sibling::div//a/@href')
-        loader.add_css('name', '[data-test=deposit-header-title]::text')
+        loader.add_css('name_base', '.bread-crumbs__item:last-child *::text')
+        loader.add_css('name_full', '[data-test=deposit-header-title]::text')
 
         try:
             module_options = response.css('[data-module*=DepositsBundle]::attr(data-module-options)').get()
@@ -125,6 +126,7 @@ class Spider(scrapy.Spider):
         loader.add_xpath('interest_payment_description', sel.format('Выплата процентов', as_note))
         loader.add_xpath('capitalization', sel.format('Капитализация', as_text))
         loader.add_xpath('special_contribution', sel.format('Специальный вклад', as_text))
+        loader.add_xpath('special_contribution_description', sel.format('Специальный вклад', as_note))
         loader.add_xpath('is_staircase_contribution', sel.format('Лестничный вклад', as_text))
         loader.add_xpath('special_conditions', sel.format('Особые условия', as_list))
         loader.add_xpath('replenishment_ability', sel.format('Пополнение', as_text))
