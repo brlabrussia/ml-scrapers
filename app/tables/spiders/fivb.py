@@ -3,11 +3,12 @@ import re
 import scrapy
 from scrapy.loader.processors import Compose
 
+from default.utils import StartUrlsMixin
 from tables.items_ import TableDataLoader, TableLoader
 from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
-class FivbSpider(scrapy.Spider):
+class FivbSpider(StartUrlsMixin, scrapy.Spider):
     name = 'fivb'
     allowed_domains = ['fivb.com', 'hypercube.nl']
     start_urls = ['https://www.fivb.com/en/volleyball/rankings/seniorworldrankingmen']

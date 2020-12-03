@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class HltvSpider(scrapy.Spider):
+class HltvSpider(StartUrlsMixin, scrapy.Spider):
     name = 'hltv'
     allowed_domains = ['hltv.org']
     start_urls = ['https://www.hltv.org/ranking/teams/']

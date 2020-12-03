@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class IihfSpider(scrapy.Spider):
+class IihfSpider(StartUrlsMixin, scrapy.Spider):
     name = 'iihf'
     allowed_domains = ['iihf.com']
     start_urls = ['https://www.iihf.com/en/worldranking']

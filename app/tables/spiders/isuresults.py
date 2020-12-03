@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class IsuresultsSpider(scrapy.Spider):
+class IsuresultsSpider(StartUrlsMixin, scrapy.Spider):
     name = 'isuresults'
     allowed_domains = ['isuresults.com']
     start_urls = ['http://www.isuresults.com/ws/ws/wsmen.htm']

@@ -3,11 +3,12 @@ import re
 import scrapy
 from scrapy.loader.processors import Compose
 
+from default.utils import StartUrlsMixin
 from tables.items_ import TableDataLoader, TableLoader
 from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
-class CybersportSpider(scrapy.Spider):
+class CybersportSpider(StartUrlsMixin, scrapy.Spider):
     name = 'cybersport'
     allowed_domains = ['cybersport.ru']
     start_urls = ['https://www.cybersport.ru/base/gamers?page=1&disciplines=21']

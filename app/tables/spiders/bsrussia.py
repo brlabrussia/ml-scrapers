@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class BsrussiaSpider(scrapy.Spider):
+class BsrussiaSpider(StartUrlsMixin, scrapy.Spider):
     name = 'bsrussia'
     allowed_domains = ['bsrussia.com']
     start_urls = ['https://bsrussia.com/ratings/mirovoy-reyting']

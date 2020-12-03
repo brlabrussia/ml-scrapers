@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class ChampionatSpider(scrapy.Spider):
+class ChampionatSpider(StartUrlsMixin, scrapy.Spider):
     name = 'championat'
     allowed_domains = ['championat.com']
     start_urls = ['https://www.championat.com/tennis/rating/1/2020/0/']

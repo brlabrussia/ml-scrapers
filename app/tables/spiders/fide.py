@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class FideSpider(scrapy.Spider):
+class FideSpider(StartUrlsMixin, scrapy.Spider):
     name = 'fide'
     allowed_domains = ['fide.com']
     start_urls = ['https://ratings.fide.com/top_lists.phtml?list=women']

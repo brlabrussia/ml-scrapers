@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class Wikipedia2Spider(scrapy.Spider):
+class Wikipedia2Spider(StartUrlsMixin, scrapy.Spider):
     name = 'wikipedia2'
     allowed_domains = ['wikipedia.org']
     start_urls = ['https://ru.wikipedia.org/wiki/Клуб_Льва_Яшина']

@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class TopsnookerSpider(scrapy.Spider):
+class TopsnookerSpider(StartUrlsMixin, scrapy.Spider):
     name = 'topsnooker'
     allowed_domains = ['topsnooker.com']
     start_urls = ['http://top-snooker.com/world-rankings/']

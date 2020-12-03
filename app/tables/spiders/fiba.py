@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class FibaSpider(scrapy.Spider):
+class FibaSpider(StartUrlsMixin, scrapy.Spider):
     name = 'fiba'
     allowed_domains = ['fiba.basketball']
     start_urls = ['https://www.fiba.basketball/rankingmen']

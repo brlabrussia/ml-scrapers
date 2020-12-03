@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class UefaSpider(scrapy.Spider):
+class UefaSpider(StartUrlsMixin, scrapy.Spider):
     name = 'uefa'
     allowed_domains = ['uefa.com']
     start_urls = ['https://ru.uefa.com/memberassociations/uefarankings/country/#/yr/2020']

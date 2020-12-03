@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class SportSpider(scrapy.Spider):
+class SportSpider(StartUrlsMixin, scrapy.Spider):
     name = 'sport'
     allowed_domains = ['sport.ru', 'google.com']
     start_urls = ['https://www.sport.ru/tennis/wta/rating-gonka/']

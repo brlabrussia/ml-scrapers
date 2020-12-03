@@ -3,11 +3,12 @@ import re
 import scrapy
 from scrapy.loader.processors import Compose
 
+from default.utils import StartUrlsMixin
 from tables.items_ import TableDataLoader, TableLoader
 from tables.utils import BASIC_POST_PROCESSOR, prepare_table_selector
 
 
-class FifaSpider(scrapy.Spider):
+class FifaSpider(StartUrlsMixin, scrapy.Spider):
     name = 'fifa'
     allowed_domains = ['fifa.com']
     start_urls = ['https://www.fifa.com/fifa-world-ranking/ranking-table/men/']

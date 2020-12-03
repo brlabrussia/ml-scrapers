@@ -3,6 +3,7 @@ import re
 import scrapy
 from scrapy.loader.processors import Compose
 
+from default.utils import StartUrlsMixin
 from tables.items_ import TableDataLoader, TableLoader
 from tables.utils import (
     normalize_style_attributes,
@@ -15,7 +16,7 @@ from tables.utils import (
 )
 
 
-class UfcSpider(scrapy.Spider):
+class UfcSpider(StartUrlsMixin, scrapy.Spider):
     name = 'ufc'
     allowed_domains = ['bsrussia.com']
     start_urls = ['https://ru.ufc.com/rankings']

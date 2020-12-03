@@ -1,9 +1,10 @@
 import scrapy
 
+from default.utils import StartUrlsMixin
 from tables.items import TableDataLoader, TableLoader
 
 
-class LivetennisSpider(scrapy.Spider):
+class LivetennisSpider(StartUrlsMixin, scrapy.Spider):
     name = 'livetennis'
     allowed_domains = ['live-tennis.eu']
     start_urls = ['https://live-tennis.eu/ru/official-atp-ranking']
