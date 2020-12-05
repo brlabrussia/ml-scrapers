@@ -4,7 +4,13 @@ BOT_NAME = 'default'
 SPIDER_MODULES = None
 NEWSPIDER_MODULE = None
 
-LOG_LEVEL = 'INFO'
+DEBUG = os.getenv('DEBUG', 0)
+
+if DEBUG:
+    LOG_LEVEL = 'DEBUG'
+else:
+    LOG_LEVEL = 'INFO'
+
 FEED_EXPORT_ENCODING = 'utf-8'
 TELNETCONSOLE_ENABLED = False
 
@@ -61,3 +67,9 @@ SPIDER_MIDDLEWARES.update({
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 SPLASH_LOG_400 = False
+
+if DEBUG:
+    HTTPCACHE_ENABLED = True
+    HTTPCACHE_DIR = 'httpcache'
+    HTTPCACHE_EXPIRATION_SECS = 3600 * 10
+    HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
