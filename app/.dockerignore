@@ -1,6 +1,6 @@
-./app/.scrapy/
-./app/.scrapyd/
-./app/twistd.pid
+./.scrapy/
+./.scrapyd/
+./twistd.pid
 
 **__pycache__/
 *.py[cod]
