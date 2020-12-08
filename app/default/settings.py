@@ -71,5 +71,5 @@ SPLASH_LOG_400 = False
 if DEBUG:
     HTTPCACHE_ENABLED = True
     HTTPCACHE_DIR = 'httpcache'
-    HTTPCACHE_EXPIRATION_SECS = 3600 * 10
+    HTTPCACHE_EXPIRATION_SECS = 3600 * 100
     HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
