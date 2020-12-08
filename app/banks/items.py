@@ -322,11 +322,16 @@ class ConsumerCredit(Item):
     banki_url = Field()
     banki_bank_url = Field()
 
+    name_base = Field()
+    name_full = Field()
+
     account_currency = Field()
     loan_purpose = Field()
     loan_purpose_description = Field()
-    is_subjected_to_fee = Field()
+    credit_fee = Field()
+    credit_fee_description = Field()
     loan_security = Field()
+    loan_security_description = Field()
     credit_insurance = Field()
     credit_insurance_description = Field()
     additional_information = Field()
@@ -335,6 +340,7 @@ class ConsumerCredit(Item):
     borrowers_age_men = Field()
     borrowers_age_women = Field()
     work_experience = Field()
+    work_experience_description = Field()
     borrowers_registration = Field()
     borrowers_income_description = Field()
     borrowers_income_tip = Field()
@@ -344,45 +350,17 @@ class ConsumerCredit(Item):
     application_consider_time_description = Field()
     credit_decision_time = Field()
     loan_processing_terms = Field()
+    loan_delivery_order = Field()
+    loan_delivery_order_description = Field()
     loan_delivery_type = Field()
+    loan_delivery_type_description = Field()
     repayment_procedure = Field()
+    repayment_procedure_description = Field()
     early_repayment_full = Field()
     early_repayment_partial = Field()
     obligations_violation = Field()
     payment_method = Field()
     updated_at = Field()
-
-
-class ConsumerCreditLoader(ItemLoader):
-    default_item_class = ConsumerCredit
-    default_input_processor = MapCompose(
-        normalize_spaces,
-        drop_blanks,
-    )
-    default_output_processor = TakeFirst()
-
-    banki_bank_url_in = MapCompose(
-        lambda x: ('https://www.banki.ru' + x) if x.startswith('/') else x,
-    )
-    is_subjected_to_fee_in = MapCompose(
-        normalize_spaces,
-        lambda x: False if x.lower() == 'нет' else True,
-    )
-    loan_security_out = Identity()
-    credit_insurance_out = Identity()
-    credit_insurance_description_out = Identity()
-    rates_table_in = rates_table_out = Identity()
-    borrowers_category_out = Identity()
-    borrowers_age_men_out = borrowers_age_women_out = Join()
-    borrowers_registration_out = Identity()
-    borrowers_income_documents_out = Identity()
-    borrowers_documents_out = Identity()
-    loan_processing_terms_out = Identity()
-    loan_delivery_type_out = Identity()
-    repayment_procedure_out = Identity()
-    early_repayment_full_out = early_repayment_partial_out = Identity()
-    payment_method_out = Identity()
-    updated_at_in = MapCompose(format_date)
 
 
 class Deposit(Item):
