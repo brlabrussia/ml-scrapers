@@ -24,6 +24,7 @@ class Loader(DefaultLoader):
         borrowers_income_documents_in = \
         borrowers_income_documents_out = \
         borrowers_registration_out = \
+        credit_fee_description_in = \
         credit_fee_in = \
         credit_fee_out = \
         credit_insurance_in = \
@@ -101,12 +102,12 @@ class Spider(scrapy.Spider):
             ret = [
                 {
                     ' '.join([
-                        (el.xpath('normalize-space(text())').get() or ''),
+                        (el.xpath('text()').get() or ''),
                         (el.xpath('.//*[not(has-class("text-note"))]//text()').get() or ''),
                     ]):
                     (el.xpath('.//*[has-class("text-note")]/text()').get() or ''),
                 }
-                for el in response.xpath(sel.format(field, '/div/div'))
+                for el in response.xpath(sel.format(field, '/div/div[not(has-class("text-note"))]'))
             ]
             if not ret:
                 ret = [{(response.xpath(sel.format(field, '/text()')).get() or ''): ''}]
@@ -116,6 +117,62 @@ class Spider(scrapy.Spider):
             ]
             ret = [d for d in ret if d != {'': ''}]
             return ret
+
+        def as_list_pairs4(field):
+            ret = [
+                {
+                    ' '.join([
+                        (el.xpath('text()').get() or ''),
+                        (el.xpath('.//*[not(has-class("text-note"))]//text()').get() or ''),
+                    ]):
+                    (el.css('.text-note::text').get() or ''),
+                }
+                for el in response.xpath(sel.format(field, '/ul/li'))
+            ]
+            ret = [
+                {normalize_space(k): normalize_space(v) for k, v in d.items()}
+                for d in ret
+            ]
+            ret = [d for d in ret if d != {'': ''}]
+            return ret
+
+        def extract_credit_fee(sel):
+            sel = '//*[has-class("definition-list__item")][@data-currency-id="{}"]' + sel
+            field = 'Комиссии'
+            ret = {}
+            for currency in ['RUB', 'USD', 'EUR']:
+                val = [
+                    {
+                        ' '.join([
+                            (''.join(el.xpath('./text()').getall()) or ''),
+                            (el.xpath('normalize-space(.//*[not(has-class("text-note"))]//text())').get() or ''),
+                        ]):
+                        (el.css('.text-note::text').get() or ''),
+                    }
+                    for el in response.xpath(sel.format(currency, field, '//ul/li'))
+                ]
+                if not val:
+                    val = [{(response.xpath(sel.format(currency, field, '/text()')).get() or ''): ''}]
+                val = [
+                    {normalize_space(k): normalize_space(v) for k, v in d.items()}
+                    for d in val
+                ]
+                val = [d for d in val if d != {'': ''}]
+                if not val:
+                    continue
+                ret[currency] = val
+            return ret or None
+
+        def extract_credit_fee_description(sel):
+            sel = '//*[has-class("definition-list__item")][@data-currency-id="{}"]' + sel
+            field = 'Комиссии'
+            ret = {}
+            for currency in ['RUB', 'USD', 'EUR']:
+                val = response.xpath(sel.format(currency, field, as_list_pairs_note)).get()
+                if not val:
+                    continue
+                ret[currency] = val
+            return ret or None
 
         loader = Loader(response=response)
         loader.add_value('banki_url', response.url)
@@ -133,9 +190,10 @@ class Spider(scrapy.Spider):
         loader.add_xpath('account_currency', sel.format('Валюта счета', as_text))
         loader.add_xpath('loan_purpose', sel.format('Цель кредита', as_list))
         loader.add_xpath('loan_purpose_description', sel.format('Цель кредита', as_note))
-        loader.add_value('credit_fee', as_list_pairs('Комиссии'))
-        loader.add_xpath('credit_fee_description', sel.format('Комиссии', as_list_pairs_note))
+        loader.add_value('credit_fee', extract_credit_fee(sel))
+        loader.add_value('credit_fee_description', extract_credit_fee_description(sel))
         loader.add_value('loan_security', as_list_pairs2('Обеспечение'))
+        loader.add_xpath('loan_security_description', sel.format('Обеспечение', '/*/*[has-class("text-note")]/text()'))
         loader.add_xpath('loan_security_description', sel.format('Обеспечение', as_list_pairs_note))
         loader.add_value('credit_insurance', as_list_pairs('Страхование'))
         loader.add_xpath('credit_insurance_description', sel.format('Страхование', as_list_pairs_note))
@@ -149,7 +207,8 @@ class Spider(scrapy.Spider):
         loader.add_xpath('borrowers_income_description', sel.format('Доход', as_text))
         loader.add_xpath('borrowers_income_tip', sel.format('Доход', as_note))
         loader.add_value('borrowers_income_documents', as_list_pairs('Доход'))
-        loader.add_value('borrowers_documents', as_list_pairs('Документы'))
+        loader.add_value('borrowers_documents', as_list_pairs4('Документы'))
+        loader.add_xpath('borrowers_documents_description', sel.format('Документы', '/div/ul/li/text()'))
         loader.add_xpath('application_consider_time', sel.format('Срок рассмотрения заявки', as_text))
         loader.add_xpath('application_consider_time_description', sel.format('Срок рассмотрения заявки', as_note))
         loader.add_xpath('credit_decision_time', sel.format('Максимальный срок действия кредитного решения', as_text))

@@ -346,6 +346,7 @@ class ConsumerCredit(Item):
     borrowers_income_tip = Field()
     borrowers_income_documents = Field()
     borrowers_documents = Field()
+    borrowers_documents_description = Field()
     application_consider_time = Field()
     application_consider_time_description = Field()
     credit_decision_time = Field()
