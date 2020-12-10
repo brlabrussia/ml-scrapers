@@ -1,5 +1,6 @@
 import re
 
+import bleach
 import scrapy
 from scrapy.loader.processors import Compose
 
@@ -27,10 +28,10 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
         normalize_style_attributes,
         remove_browser_css_properties,
         # remove_weird_css_properties,
-        remove_color_css_properties,
-        replace_anchors,
+        # remove_color_css_properties,
+        # replace_anchors,
         lambda x: x.replace('visibility:hidden;', ''),
-        lambda x: re.sub(r'border-bottom.*?;', r'', x, flags=re.S),
+        # lambda x: re.sub(r'border-bottom.*?;', r'', x, flags=re.S),
         # lambda x: re.sub(r'\s(class|href)="[^"]*?"', r'', x, flags=re.S),
     )
 
@@ -47,20 +48,49 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
         table_sel = table_sel.xpath(xp)
 
         # upper body
+        is_top_rank_table = False
         row_loaders = []
         tdl = TableDataLoader(selector=table_sel)
-        tdl.add_xpath('value', './/caption/node()')
-        tdl.add_value('value', '')
-        tdl.add_value('colspan', '3')
+        value = (
+            table_sel.xpath('.//*[@class="info"]/h6/node()').get()
+            or table_sel.xpath('.//*[@class="info"]/h4/span/node()').get()
+        )
+        value = bleach.clean(value, tags=[], strip=True).strip()
+        value = f'<b>{value}</b>'
+        if 'top rank' in value.lower():
+            value = '1'
+            is_top_rank_table = True
+        tdl.add_value('value', value)
         row_loaders.append(tdl)
+
+        tdl = TableDataLoader(selector=table_sel)
+        value = table_sel.xpath('.//*[has-class("views-row")]').get()
+        value = bleach.clean(value, tags=[], strip=True).strip()
+        if not is_top_rank_table:
+            value = f'<b>{value}</b>'
+        if 'khabib nurmagomedov' in value.lower():
+            value = 'Хабиб Нурмагомедов'
+        elif 'amanda nunes' in value.lower():
+            value = 'Аманда Нунис'
+        tdl.add_value('value', value)
+        row_loaders.append(tdl)
+
+        tdl = TableDataLoader(selector=table_sel)
+        tdl.base_url = response.url
+        tdl.add_value('value', '')
+        row_loaders.append(tdl)
+
         tl.add_value('body', [row_loaders])
 
         # rest of body
         for row_sel in table_sel.css('tbody tr'):
             row_loaders = []
-            for data_sel in row_sel.css('td'):
+            for index, data_sel in enumerate(row_sel.css('td')):
                 tdl = TableDataLoader(selector=data_sel)
-                tdl.add_xpath('value', './node()')
+                value = data_sel.xpath('./node()').get()
+                if index in (0, 1):
+                    value = bleach.clean(value, tags=[], strip=True)
+                tdl.add_value('value', value)
                 tdl.add_value('value', '')
                 tdl.add_xpath('colspan', './@colspan')
                 tdl.add_xpath('rowspan', './@rowspan')
