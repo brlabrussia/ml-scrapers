@@ -11,7 +11,7 @@ def remove_style_tags(string: str) -> str:
 
 
 def remove_unwanted_attributes(string: str) -> str:
-    return re.sub(r'\s(?!style|src|alt|height|width)[\w-]+="[^"]*?"', r'', string, flags=re.S)
+    return re.sub(r'\s(?!style|src|alt|height|width|rowspan|colspan|text-align)[\w-]+="[^"]*?"', r'', string, flags=re.S)
 
 
 def normalize_style_attributes(string: str) -> str:
