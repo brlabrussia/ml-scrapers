@@ -5,6 +5,7 @@ SPIDER_MODULES = ['tables.spiders']
 NEWSPIDER_MODULE = 'tables.spiders'
 
 ITEM_PIPELINES = {
+    'tables.pipelines.WikipediaPipeline': 1,
     'tables.pipelines.WebhookPipeline': 800,
 }
 

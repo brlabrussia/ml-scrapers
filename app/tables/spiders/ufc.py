@@ -60,6 +60,8 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
         if 'top rank' in value.lower():
             value = '1'
             is_top_rank_table = True
+        if 'чемпион' in value.lower():
+            value = '<b>Ч</b>'
         tdl.add_value('value', value)
         row_loaders.append(tdl)
 
@@ -72,6 +74,8 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
             value = 'Хабиб Нурмагомедов'
         elif 'amanda nunes' in value.lower():
             value = 'Аманда Нунис'
+        elif 'conor mcgregor' in value.lower():
+            value = 'Конор Макгрегор'
         tdl.add_value('value', value)
         row_loaders.append(tdl)
 

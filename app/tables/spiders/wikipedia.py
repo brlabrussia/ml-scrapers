@@ -40,7 +40,7 @@ class WikipediaSpider(StartUrlsMixin, scrapy.Spider):
                 tdl.add_value('value', '')
                 tdl.add_xpath('colspan', './@colspan')
                 tdl.add_xpath('rowspan', './@rowspan')
-                tdl.add_xpath('style', './@style')
+                tdl.add_value('style', 'text-align:left')
                 row_loaders.append(tdl)
             tl.add_value('head', [row_loaders])
 
@@ -57,7 +57,7 @@ class WikipediaSpider(StartUrlsMixin, scrapy.Spider):
                 tdl.add_value('value', '')
                 tdl.add_xpath('colspan', './@colspan')
                 tdl.add_xpath('rowspan', './@rowspan')
-                tdl.add_xpath('style', './@style')
+                tdl.add_value('style', 'text-align:left')
                 row_loaders.append(tdl)
             tl.add_value('body', [row_loaders])
 
