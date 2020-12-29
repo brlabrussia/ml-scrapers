@@ -1,4 +1,5 @@
 import os
+import re
 
 from default.pipelines import WebhookPipeline as WebhookPipeline_
 
@@ -22,19 +23,26 @@ class WikipediaPipeline:
     def process_item(self, item, spider):
         if spider.name == 'wikipedia':
             item = self.process_wikipedia(item, spider)
-            spider.logger.info('process_item')
         return item
 
     def process_wikipedia(self, item, spider):
         body = item['body']
-        if 'Чемпион</b>' in body[0][0]['value']:
-            spider.logger.info('champ')
-            body.pop(0)
-            if not body[0][0]['value']:
-                body[0][0]['value'] = '<b>Ч</b>'
-                body[0][1]['value'] = f'<b>{body[0][1]["value"]}</b>'
-                body[0][2]['value'] = f'<b>{body[0][2]["value"]}</b>'
-            if not body[1][0]['value'] and body[1][0]['colspan'] == '3':
-                body.pop(1)
+        for index, row in enumerate(body):
+            # sus row
+            if len(row) == 1:
+                # next row's 1st value is empty
+                if not body[index + 1][0]['value']:
+                    # assign current row's 1st value to next row's 1st value
+                    t = row[0]['value']
+                    t = re.sub(r'<.*?>', '', t)
+                    t = ''.join(w[0] for w in t.upper().split())
+                    t = f'<b>{t}</b>'
+                    body[index + 1][0]['value'] = t
+                    # make rest of the values bold
+                    for index2, data in enumerate(body[index + 1]):
+                        if index2 == 0:
+                            continue
+                        body[index + 1][index2]['value'] = f'<b>{data["value"]}</b>'
+                body.pop(index)
         item['body'] = body
         return item
