@@ -395,3 +395,22 @@ class Deposit(Item):
     partial_withdrawal = Field()
     partial_withdrawal_description = Field()
     updated_at = Field()
+
+
+class Branch(Item):
+    banki_id = Field()
+    latitude = Field()
+    longitude = Field()
+    name = Field()
+    address = Field()
+    type = Field()
+
+    bank_url = Field()
+    bank_name = Field()
+
+    metro = Field()
+    phone = Field()
+    schedule = Field()
+
+    region_name = Field()
+    region_name_full = Field()
