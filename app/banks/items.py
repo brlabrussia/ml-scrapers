@@ -414,3 +414,16 @@ class Branch(Item):
 
     region_name = Field()
     region_name_full = Field()
+
+
+class Rating(Item):
+    banki_url = Field()
+    banki_bank_url = Field()
+
+    net_assets = Field()
+    net_profit = Field()
+    equity = Field()
+    credit_portfolio = Field()
+    npls = Field()
+    private_deposits = Field()
+    investment_in_securities = Field()
