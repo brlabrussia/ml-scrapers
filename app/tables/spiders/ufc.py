@@ -21,7 +21,7 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
     name = 'ufc'
     allowed_domains = ['bsrussia.com']
     start_urls = ['https://ru.ufc.com/rankings']
-    table_name = 'Полусредний вес'
+    table_name = 'Женский наилегчайший вес'
     post_processor = Compose(
         remove_style_tags,
         # remove_unwanted_attributes,
@@ -46,6 +46,14 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
             post_processor=self.post_processor,
         )
         table_sel = table_sel.xpath(xp)
+
+        # head
+        row_loaders = []
+        for value in ['', 'Боец', '']:
+            tdl = tdl = TableDataLoader(response=response)
+            tdl.add_value('value', value)
+            row_loaders.append(tdl)
+        tl.add_value('head', [row_loaders])
 
         # upper body
         is_top_rank_table = False
@@ -94,6 +102,10 @@ class UfcSpider(StartUrlsMixin, scrapy.Spider):
                 value = data_sel.xpath('./node()').get()
                 if index in (0, 1):
                     value = bleach.clean(value, tags=[], strip=True)
+                elif index == 2:
+                    value = value.replace('Rank increased by', '')
+                    value = value.replace('Rank decreased by', '')
+                    value = re.sub(r'<[^>]*?athlete-rankings--not-ranked.*?</span>', r'', value, flags=re.S)
                 tdl.add_value('value', value)
                 tdl.add_value('value', '')
                 tdl.add_xpath('colspan', './@colspan')
